@@ -1,0 +1,51 @@
+package grammar
+
+type BlockQuery Peg {
+}
+
+# Rules
+Result <- queryStmt !.
+
+queryStmt <- selectStmt (space queryExprs)*
+
+queryExprs <- queryExpr (space queryExpr)*
+queryExpr <- limitStmt / orderStmt / whereStmt
+
+selectStmt <- select space (star / WordList) space fromStmt
+fromStmt <- from Word
+limitStmt <- limit Number
+orderStmt <- order by WordList
+
+whereStmt <- where whereExprs
+whereExprs <- whereExpr (space (and/or) whereExpr)*
+whereExpr <- Word equals Word
+
+select <- "SELECT" space
+from <- "FROM" space
+order <- "ORDER" space
+by <- "BY" space
+star <- ('*' / "ALL") space
+limit <- "LIMIT" space
+where <- "WHERE" space
+and <- "AND" space
+or <- "OR" space
+
+equals <- "=" space
+
+squote <- '\''
+dquote <- '"'
+
+# Token matchers
+Number <- [0-9]* {}
+Letter <- [a-z] / [A-Z] / [_$]
+LetterOrDigit <- [a-z] / [A-Z] / [0-9] / [_$]
+
+WordList <- Word (space ',' space? WordList)*
+Words <- Word (space Word)*
+Word <- (squote / dquote)? < Letter LetterOrDigit* > (squote / dquote)? {}
+
+
+space <- ( [ \t\r\n]+              # WhiteSpace [ \t\r\n\u000C]+
+      / '/*' (!'*/' .)* '*/'      # TraditionalComment
+      / '//' (![\r\n] .)* [\r\n]  # EndOfLineComment
+      )*
