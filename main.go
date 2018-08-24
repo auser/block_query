@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
-	cmd "github.com/auser/block_query/cmd"
+	bq "github.com/auser/block_query/grammar"
 	"github.com/urfave/cli"
 )
 
@@ -20,13 +22,37 @@ func Run(args []string) {
 	app.Version = version
 	app.Usage = "block query"
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:  "nocolor",
-			Usage: "disable color",
+		cli.StringFlag{
+			Name:  "query",
+			Usage: "query",
 		},
 	}
-	app.Commands = []cli.Command{cmd.QueryCmd}
-	app.Run(args)
+	app.Action = handleQuery
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func handleQuery(c *cli.Context) error {
+	fmt.Printf("Hi?")
+	query := c.String("query")
+
+	if query == "" {
+		log.Fatal("No query defined. Must be passed in")
+	}
+
+	// buffer := bufio.NewReader(strings.NewReader(query))
+	fmt.Printf("Handling query: %s\n", query)
+	q := &bq.BlockQuery{Buffer: query, Pretty: true}
+	q.Init()
+	if err := q.Parse(); err != nil {
+		log.Fatal(err)
+	}
+	// bq.Execute()
+	q.PrintSyntaxTree()
+	return nil
 }
 
 func readVersion() string {
