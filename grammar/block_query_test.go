@@ -20,6 +20,8 @@ func TestBlockQuery_Select(t *testing.T) {
 		{"select * from transactions WHERE from='0xdeadbeef' AND value > 100", 76},
 		{"select * from transactions WHERE from='0xdeadbeef' AND value < 100", 76},
 		{"select * from transactions WHERE from='0xdeadbeef' AND to=0xalivebeef", 84},
+		{"select * from transactions WHERE from='0xdeadbeef' AND to != '0xalivebeef'", 86},
+		{"select * from transactions WHERE from='0xdeadbeef' OR to=0xalivebeef LIMIT 10", 91},
 	}
 
 	for i, tt := range tests {

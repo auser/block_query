@@ -26,6 +26,10 @@ func Run(args []string) {
 			Name:  "query",
 			Usage: "query",
 		},
+		cli.BoolFlag{
+			Name:  "debug",
+			Usage: "debug statements",
+		},
 	}
 	app.Action = handleQuery
 	err := app.Run(os.Args)
@@ -36,22 +40,26 @@ func Run(args []string) {
 }
 
 func handleQuery(c *cli.Context) error {
-	fmt.Printf("Hi?")
 	query := c.String("query")
+	debugging := c.Bool("debug")
 
 	if query == "" {
 		log.Fatal("No query defined. Must be passed in")
 	}
 
-	// buffer := bufio.NewReader(strings.NewReader(query))
-	fmt.Printf("Handling query: %s\n", query)
-	q := &bq.BlockQuery{Buffer: query, Pretty: true}
+	q := &bq.BlockQuery{Buffer: query, Pretty: debugging}
 	q.Init()
 	if err := q.Parse(); err != nil {
 		log.Fatal(err)
 	}
-	// bq.Execute()
-	q.PrintSyntaxTree()
+	q.Execute()
+
+	if debugging {
+		q.PrintSyntaxTree()
+	}
+
+	fmt.Printf("%v\n", q.ExprStack.String())
+
 	return nil
 }
 
