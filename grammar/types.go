@@ -33,19 +33,6 @@ type Limit struct {
 	Count       int
 }
 
-type NodeExpr interface {
-	String() string
-}
-
-type NodeEquals struct {
-	left  string
-	right string
-}
-
-func (n *NodeEquals) String() string {
-	return fmt.Sprintf("%s == %s", n.left, n.right)
-}
-
 // Stack is a basic LIFO stack that resizes as needed.
 type ExprStack struct {
 	nodes []NodeExpr
@@ -79,6 +66,19 @@ func (s *ExprStack) String() string {
 	return str
 }
 
+type NodeExpr interface {
+	String() string
+}
+
+type NodeEquals struct {
+	left  string
+	right string
+}
+
+func (n *NodeEquals) String() string {
+	return fmt.Sprintf("%s == %s", n.left, n.right)
+}
+
 type NodeAnd struct {
 	left  NodeExpr
 	right NodeExpr
@@ -86,6 +86,15 @@ type NodeAnd struct {
 
 func (n *NodeAnd) String() string {
 	return fmt.Sprintf("%s AND %s", n.left.String(), n.right.String())
+}
+
+type NodeOr struct {
+	left  NodeExpr
+	right NodeExpr
+}
+
+func (n *NodeOr) String() string {
+	return fmt.Sprintf("%s OR %s", n.left.String(), n.right.String())
 }
 
 type NodeGreaterThan struct {

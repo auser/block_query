@@ -398,6 +398,11 @@ func (p *BlockQuery) Execute() {
 
 		case ruleAction7:
 
+			p.ExprStack.Push(&NodeOr{
+				left:  p.ExprStack.Pop(),
+				right: p.ExprStack.Pop(),
+			})
+
 		case ruleAction8:
 
 			p.ExprStack.Push(&NodeEquals{
@@ -3160,7 +3165,12 @@ func (p *BlockQuery) Init() {
 			}
 			return true
 		},
-		/* 57 Action7 <- <{}> */
+		/* 57 Action7 <- <{
+		   p.ExprStack.Push(&NodeOr{
+		     left: p.ExprStack.Pop(),
+		     right: p.ExprStack.Pop(),
+		   })
+		 }> */
 		func() bool {
 			{
 				add(ruleAction7, position)

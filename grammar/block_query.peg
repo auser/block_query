@@ -45,7 +45,12 @@ whereExpr <-
       right: p.ExprStack.Pop(),
     })
   }
-  / or whereExpr {}
+  / or whereExpr {
+    p.ExprStack.Push(&NodeOr{
+      left: p.ExprStack.Pop(),
+      right: p.ExprStack.Pop(),
+    })
+  }
   / Word equals StringLiteral {
     p.ExprStack.Push(&NodeEquals{
       left: p.workingWord,
