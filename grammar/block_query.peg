@@ -13,12 +13,15 @@ queryExpr <- limitStmt / orderStmt / whereStmt
 
 selectStmt <- select space (star / WordList) space fromStmt
 fromStmt <- from Word
-limitStmt <- limit Number
+limitStmt <- limit DecimalNumeral
 orderStmt <- order by WordList
 
 whereStmt <- where whereExprs
-whereExprs <- whereExpr (space (and/or) whereExpr)*
-whereExpr <- Word equals Word
+whereExprs <- whereExpr (space (and / or) whereExpr)*
+whereExpr <- (
+  Word equals StringLiteral
+  / Word greaterThan DecimalNumeral
+)
 
 select <- "SELECT" space
 from <- "FROM" space
@@ -29,21 +32,32 @@ limit <- "LIMIT" space
 where <- "WHERE" space
 and <- "AND" space
 or <- "OR" space
+greaterThan <- space? '>' space?
 
-equals <- "=" space
+equals <- space? "=" space?
 
 squote <- '\''
-dquote <- '"'
+dquote <- '\"'
 
 # Token matchers
-Number <- [0-9]* {}
-Letter <- [a-z] / [A-Z] / [_$]
-LetterOrDigit <- [a-z] / [A-Z] / [0-9] / [_$]
+Letter <- [[a-z]]
+LetterOrDigit <- [[a-z]] / [0-9]
+
+HexDigit <- [[a-f]] / [0-9]
+DecimalNumeral <- '0' / [0-9] ([_]* [0-9])*
+
+StringLiteral <- (squote / dquote)? (Escape / !["\\\n\r] .)* (squote / dquote)?
+Escape <- '\\' ([btnfr"'\\] / OctalEscape / UnicodeEscape)
+OctalEscape
+   <- [0-3][0-7][0-7]
+    / [0-7][0-7]
+    / [0-7]
+
+UnicodeEscape
+   <- 'u'+ HexDigit HexDigit HexDigit HexDigit
 
 WordList <- Word (space ',' space? WordList)*
-Words <- Word (space Word)*
 Word <- (squote / dquote)? < Letter LetterOrDigit* > (squote / dquote)? {}
-
 
 space <- ( [ \t\r\n]+              # WhiteSpace [ \t\r\n\u000C]+
       / '/*' (!'*/' .)* '*/'      # TraditionalComment

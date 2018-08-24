@@ -12,9 +12,9 @@ func TestBlockQuery_Select(t *testing.T) {
 		query          string
 		expectedASTLen int
 	}{
-		{"select * from transactions", 15},
-		{"select ALL from transactions", 15},
-		{"select * from transactions LIMIT 10", 15},
+		{"select * from transactions", 27},
+		{"select ALL from transactions", 27},
+		{"select * from transactions LIMIT 10", 34},
 	}
 
 	for i, tt := range tests {
