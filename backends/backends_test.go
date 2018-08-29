@@ -1,7 +1,6 @@
 package backends
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/auser/block_query/backends"
@@ -12,29 +11,41 @@ func TestJsonParsing_Test(t *testing.T) {
 		str           string
 		expectedValue []string
 	}{
+		// {
+		// 	str: `10`,
+		// 	expectedValue: []string{
+		// 		"10",
+		// 	},
+		// },
+		// {
+		// 	str: `{"hello": "world"}`,
+		// 	expectedValue: []string{
+		// 		"{", "hello", "world", "}",
+		// 	},
+		// },
+		// {
+		// 	str: `{"hello": "world", "valid": true}`,
+		// 	expectedValue: []string{
+		// 		"{", "hello", "world", "}",
+		// 	},
+		// },
+		// {
+		// 	str: `[1, 2, 3, 4]`,
+		// 	expectedValue: []string{
+		// 		"{", "hello", "world", "}",
+		// 	},
+		// },
 		{
-			str: `10`,
-			expectedValue: []string{
-				"10",
-			},
-		},
-		{
-			str: `{"hello": "world"}`,
-			expectedValue: []string{
-				"{", "hello", "world", "}",
-			},
-		},
-		{
-			str: `{"hello": "world", "valid": true}`,
-			expectedValue: []string{
-				"{", "hello", "world", "}",
-			},
-		},
-		{
-			str: `[1, 2, 3, 4]`,
-			expectedValue: []string{
-				"{", "hello", "world", "}",
-			},
+			str: `{
+				"name": "Ari",
+				"pets": {
+					"cats": [],
+					"dogs": [
+						"Ginger"
+					]
+				}
+			}`,
+			expectedValue: []string{},
 		},
 	}
 
@@ -48,8 +59,6 @@ func TestJsonParsing_Test(t *testing.T) {
 		// for k, v := range out {
 		// 	fmt.Printf("Key: %q, Value: %q\n", k, v)
 		// }
-		fmt.Printf("val: %v\n", out.(*backends.JSON).String())
 		t.Logf("Out: %#v %#v\n", out, err)
-		t.Error()
 	}
 }

@@ -48,7 +48,7 @@ Value <- val:( Number / Array / Object / String / Number / Null / Bool ) _ {
   return val, nil
 }
 
-Object <- '{' _ vals:( KVPair ( ',' _ KVPair )* )? '}' {
+Object <- '{' _ vals:( KVPair ( ',' _ KVPair? )* )? '}' {
   valsS1 := toIfaceSlide(vals)
   pairs := []*JSONPair{}
 
@@ -64,9 +64,10 @@ Object <- '{' _ vals:( KVPair ( ',' _ KVPair )* )? '}' {
     return obj, nil
   }
 
-  for _, v := range restS1 {
+  for i, v := range restS1 {
+    fmt.Printf("v: %#v\n", v)
     vSl := toIfaceSlide(v)
-    pair := vSl[2].(*JSONPair)
+    pair := vSl[i].(*JSONPair)
     obj.Pairs = append(obj.Pairs, pair)
   }
 
@@ -77,12 +78,12 @@ KVPair <- _ vals:(String _ ':' _ Value)? {
   valsS1 := toIfaceSlide(vals)
   jsonObj := &JSONPair{
     Key: valsS1[0].(string),
-    Value: valsS1[4],
+    Value: valsS1[len(valsS1) - 1],
   }
   return jsonObj, nil
 }
 
-Array <- '[' _ vals: ( Value ( ',' _ Value )* )? ']' {
+Array <- '[' _ vals: ( Value? ( ',' _ Value )* )? ']' {
   valsS1 := toIfaceSlide(vals)
   arr := &JSONArray{
     Values: []interface{}{},
