@@ -1,0 +1,143 @@
+{
+
+package backends
+
+import utils "github.com/auser/block_query/utils"
+
+func toIfaceSlide(v interface{}) []interface{} {
+  if v == nil {
+    return nil
+  }
+
+  return v.([]interface{})
+}
+
+var currrentDepth = -1
+}
+
+JSON <- _ vals:Value+ EOF {
+  fmt.Printf("vals: %#v\n", vals)
+  valsS1 := toIfaceSlide(vals)
+
+  nums := [](*JSONNumber){}
+  obj := [](*JSONObject){}
+  arr := [](*JSONArray){}
+
+  for _, val := range valsS1 {
+    switch t := val.(type) {
+      default:
+      fmt.Printf("unexpected Type: %T\n", t)
+      case *JSONNumber:
+        nums = append(nums, val.(*JSONNumber))
+      case *JSONObject:
+        obj = append(obj, val.(*JSONObject))
+      case *JSONArray:
+        arr = append(arr, val.(*JSONArray))
+    }
+  }
+  json := &JSON{
+    depth: currrentDepth,
+    objects: obj,
+    arrays: arr,
+    nums: nums,
+  }
+  return json, nil
+}
+
+Value <- val:( Number / Array / Object / String / Number / Null / Bool ) _ {
+  return val, nil
+}
+
+Object <- '{' _ vals:( KVPair ( ',' _ KVPair )* )? '}' {
+  valsS1 := toIfaceSlide(vals)
+  pairs := []*JSONPair{}
+
+  pair := valsS1[0].(*JSONPair)
+  pairs = append(pairs, pair)
+
+  obj := &JSONObject{
+    Pairs: pairs,
+  }
+
+  restS1 := toIfaceSlide(valsS1[1])
+  if len(restS1) == 0 {
+    return obj, nil
+  }
+
+  for _, v := range restS1 {
+    vSl := toIfaceSlide(v)
+    pair := vSl[2].(*JSONPair)
+    obj.Pairs = append(obj.Pairs, pair)
+  }
+
+  return obj, nil
+}
+
+KVPair <- _ vals:(String _ ':' _ Value)? {
+  valsS1 := toIfaceSlide(vals)
+  jsonObj := &JSONPair{
+    Key: valsS1[0].(string),
+    Value: valsS1[4],
+  }
+  return jsonObj, nil
+}
+
+Array <- '[' _ vals: ( Value ( ',' _ Value )* )? ']' {
+  valsS1 := toIfaceSlide(vals)
+  arr := &JSONArray{
+    Values: []interface{}{},
+  }
+  arr.Values = append(arr.Values, valsS1[1])
+  if len(valsS1) == 0 {
+    return arr, nil
+  }
+
+  restS1 := toIfaceSlide(valsS1[1])
+
+  for _, v := range restS1 {
+    val := v.(interface{})
+    arr.Values = append(arr.Values, val)
+  }
+
+  return arr, nil
+}
+
+Number <- minus? Integer ( '.' DecimalDigit+ )? Exponent? {
+  f, err := strconv.ParseFloat(string(c.text), 64)
+  if err != nil {
+    return nil, err
+  }
+
+  return &JSONNumber{
+    Value: f,
+  }, nil
+}
+
+String <- '"' ( !EscapedChar . / '\\' EscapeSequence )* '"' {
+  //# Forward slash in go is not a valid escape in go. Fails if
+  //# there is one in the string
+  return strconv.Unquote(string(c.text))
+}
+
+EscapedChar <- [\x00-\x1f"\\]
+EscapeSequence <- SingleCharEscape / UnicodeEscape
+SingleCharEscape <- ["\\/bfnrt]
+UnicodeEscape <- 'u' HexDigit HexDigit HexDigit HexDigit
+
+minus <- '-'
+
+Integer <- ('0' / NonZeroDecimalDigit) DecimalDigit*
+
+Exponent <- 'e'i [+-]? DecimalDigit+
+
+HexDigit <- [0-9a-f]i
+
+Bool <- "true" { return true, nil  } / "false" { return false, nil }
+Null <- "null" { return nil, nil }
+
+DecimalDigit <- [0-9]
+NonZeroDecimalDigit <- [0-9a-f]i
+
+_ "whitespace" <- [ \n\t\r]*
+
+EOF <- !.
