@@ -106,6 +106,8 @@ func (node *Select) Format(buf *TrackedBuffer) {
 		node.Limit, node.Lock)
 }
 
+func (node *Select) Exec(dataSource interface{}) {}
+
 // Union represents a UNION statement.
 type Union struct {
 	Type        string
