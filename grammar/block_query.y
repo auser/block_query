@@ -5,1054 +5,737 @@
 %{
 package grammar
 
-import "bytes"
-
-func SetParseTree(yylex interface{}, stmt Statement) {
-  yylex.(*Tokenizer).ParseTree = stmt
-}
-
-func SetAllowComments(yylex interface{}, allow bool) {
-  yylex.(*Tokenizer).AllowComments = allow
-}
-
-func ForceEOF(yylex interface{}) {
-  yylex.(*Tokenizer).ForceEOF = true
-}
-
-var (
-  SHARE =        []byte("share")
-  MODE  =        []byte("mode")
-  IF_BYTES =     []byte("if")
-  VALUES_BYTES = []byte("values")
+import (
+  // "strconv"
+  "github.com/auser/block_query/value"
 )
 
 %}
 
 %union {
+  program     []Statement
   empty       struct{}
   statement   Statement
-  selStmt     SelectStatement
-  byt         byte
-  bytes       []byte
-  bytes2      [][]byte
-  str         string
-  selectExprs SelectExprs
-  selectExpr  SelectExpr
-  columns     Columns
-  colName     *ColName
-  tableExprs  TableExprs
-  tableExpr   TableExpr
-  smTableExpr SimpleTableExpr
-  tableName   *TableName
-  indexHints  *IndexHints
-  expr        Expr
-  boolExpr    BoolExpr
-  valExpr     ValExpr
-  colTuple    ColTuple
-  valExprs    ValExprs
-  values      Values
-  rowTuple    RowTuple
-  subquery    *Subquery
-  caseExpr    *CaseExpr
-  whens       []*When
-  when        *When
-  orderBy     OrderBy
-  order       *Order
-  limit       *Limit
-  insRows     InsertRows
-  updateExprs UpdateExprs
-  updateExpr  *UpdateExpr
+  queryexpr   QueryExpression
+  queryexprs  []QueryExpression
+  expression  Expression
+  expressions []Expression
+  identifier  Identifier
+  variable    Variable
+  variables   []Variable
+  token       Token
+  table       Table
 }
 
+// Tokens
 %token LEX_ERROR
-%token <empty> SELECT INSERT UPDATE DELETE FROM WHERE GROUP HAVING ORDER BY LIMIT FOR
-%token <empty> ALL DISTINCT AS EXISTS IN IS LIKE BETWEEN NULL ASC DESC VALUES INTO DUPLICATE KEY DEFAULT SET LOCK KEYRANGE
-%token <bytes> ID STRING NUMBER VALUE_ARG LIST_ARG COMMENT
-%token <empty> LE GE NE NULL_SAFE_EQUAL
-%token <empty> '(' '=' '<' '>' '~'
+%token<token>   recursive
 
-%left <empty> UNION MINUS EXCEPT INTERSECT
-%left <empty> ','
-%left <empty> JOIN STRAIGHT_JOIN LEFT RIGHT INNER OUTER CROSS NATURAL USE FORCE
-%left <empty> ON
-%left <empty> OR
-%left <empty> AND
-%right <empty> NOT
-%left <empty> '&' '|' '^'
-%left <empty> '+' '-'
-%left <empty> '*' '/' '%'
-%nonassoc <empty> '.'
-%left <empty> UNARY
-%right <empty> CASE, WHEN, THEN, ELSE
-%left <empty> END
+%token<token> IDENTIFIER STRING INTEGER FLOAT BOOLEAN TERNARY DATETIME VARIABLE FLAG
 
-// DDL Tokens
-%token <empty> CREATE ALTER DROP RENAME ANALYZE
-%token <empty> TABLE INDEX VIEW TO IGNORE IF UNIQUE USING
-%token <empty> SHOW DESCRIBE EXPLAIN
+%token<token> SELECT FROM WITH ORDER BY LIMIT OFFSET PARTITION TABLES AS
+%token<token> VIEWS CURSORS FUNCTIONS FUNCTION_NTH FUNCTION_WITH_INS
+%token<token> COMPARISON_OP STRING_OP SUBSTITUTION_OP PERCENT STDIN
 
-%start any_command
+%token<token> AND OR NOT
+%token<token> ASC DESC
+%token<token> FIRST LAST
+%token<token> ERROR UMINUS
+%token<token> COUNT LISTAGG ROWS
+%token<token> AGGREGATE_FUNCTION ANALYTIC_FUNCTION
+%token<token> ALL NULLS NULL IN EXISTS TIES FIELDS
+%token<token> '*' ';' '=' '(' ')' '-' '+' '!'
+%token<token> DISTINCT
 
-%type <statement> command
-%type <selStmt> select_statement
-%type <selStmt> missing_select_statement
-%type <statement> insert_statement update_statement delete_statement set_statement
-%type <statement> create_statement alter_statement rename_statement drop_statement
-%type <statement> analyze_statement other_statement
-%type <bytes2> comment_opt comment_list
-%type <str> union_op
-%type <str> distinct_opt
-%type <selectExprs> select_expression_list
-%type <selectExpr> select_expression
-%type <bytes> as_lower_opt as_opt
-%type <expr> expression
-%type <tableExprs> table_expression_list
-%type <tableExpr> table_expression
-%type <tableExprs> from_expression_list_opt
-%type <str> join_type
-%type <smTableExpr> simple_table_expression
-%type <tableName> dml_table_expression
-%type <indexHints> index_hint_list
-%type <bytes2> index_list
-%type <boolExpr> where_expression_opt
-%type <boolExpr> boolean_expression condition
-%type <str> compare
-%type <insRows> row_list
-%type <valExpr> value value_expression
-%type <colTuple> col_tuple
-%type <valExprs> value_expression_list
-%type <values> tuple_list
-%type <rowTuple> row_tuple
-%type <bytes> keyword_as_func
-%type <subquery> subquery
-%type <byt> unary_operator
-%type <colName> column_name
-%type <caseExpr> case_expression
-%type <whens> when_expression_list
-%type <when> when_expression
-%type <valExpr> value_expression_opt else_expression_opt
-%type <valExprs> group_by_opt
-%type <boolExpr> having_opt
-%type <orderBy> order_by_opt order_list
-%type <order> order
-%type <str> asc_desc_opt
-%type <limit> limit_opt
-%type <str> lock_opt
-%type <columns> column_list_opt column_list
-%type <updateExprs> on_dup_opt
-%type <updateExprs> update_list
-%type <updateExpr> update_expression
-%type <empty> exists_opt not_exists_opt ignore_opt non_rename_operation to_opt constraint_opt using_opt
-%type <bytes> sql_id
-%type <empty> force_eof
+%type <program> program
 
+%type <statement> procedure_statement
+%type <statement> common_statement
+
+%type<queryexpr>    select_query
+%type<queryexpr>    select_clause
+%type<queryexpr>    from_clause
+%type<queryexprs>    tables
+%type<queryexprs>  identifiers
+%type<queryexpr>    table
+%type<queryexpr>    with_clause
+%type<queryexpr>   inline_table
+%type<queryexprs>  inline_tables
+%type<queryexpr>    select_entity
+%type<queryexpr>    order_by_clause
+%type<queryexpr>    limit_clause
+%type<queryexpr>    limit_with
+%type<queryexpr>    offset_clause
+%type<queryexpr>    field_object
+%type<queryexpr>    field
+%type<queryexprs>   fields
+%type<queryexprs>   field_references
+%type<queryexpr>   field_reference
+%type<queryexpr>    value
+%type<queryexprs>   values
+%type<queryexpr>    wildcard
+%type<queryexprs>   arguments
+%type<queryexprs>   order_items
+%type<queryexpr>    order_item
+%type<queryexpr>    row_value
+%type<queryexprs>    row_values
+%type<queryexpr>    order_value
+%type<token>        order_direction
+%type<queryexpr>    null
+%type<queryexpr>    aggregate_function
+%type<token>        order_null_position
+%type<queryexpr>    limit_with
+%type<queryexpr>    offset_clause
+%type<queryexpr>    field_reference
+%type<queryexpr>    primitive_type
+%type<queryexpr>   arithmetic
+%type<queryexpr>   ternary
+
+%type<queryexpr>   logic
+%type<queryexpr>    string_operation
+%type<queryexpr>    subquery
+%type<queryexpr>   comparison
+
+%type<variable>     variable
+%type<variables>    variables
+
+%type<queryexpr>    variable_substitution
+%type<queryexpr>   table_identifier
+%type<table>        identified_table
+%type<queryexpr>    virtual_table_object
+
+%type<queryexpr>   analytic_function
+// %type<queryexpr>   analytic_clause
+// %type<queryexpr>   partition_clause
+
+%type<identifier>  identifier
+
+%type<token>       all
+%type<token>       distinct
+%type<token>       as
+%type<token>       comparison_operator
+
+
+
+%right SUBSTITUTION_OP
+%left UNION EXCEPT
+%left INTERSECT
+%left CROSS FULL NATURAL JOIN
+%left OR
+%left AND
+%right NOT
+%nonassoc '=' COMPARISON_OP IS BETWEEN IN LIKE
+%left STRING_OP
+%left '+' '-'
+%left '*' '/' '%'
+%right UMINUS UPLUS '!'
+
+%start program
 
 %%
 
-any_command:
-  command
-  {
-    SetParseTree(yylex, $1)
-  }
-
-command:
-  select_statement
-  {
-    $$ = $1
-  }
-| missing_select_statement
-  {
-    $$ = $1
-  }
-| insert_statement
-| update_statement
-| delete_statement
-| set_statement
-| create_statement
-| alter_statement
-| rename_statement
-| drop_statement
-| analyze_statement
-| other_statement
-
-missing_select_statement:
-  distinct_opt select_expression_list from_expression_list_opt where_expression_opt group_by_opt having_opt order_by_opt limit_opt lock_opt
-  {
-    $$ = &Select{Comments: nil, Distinct: $1, SelectExprs: $2, From: NewFrom(AST_FROM, $3), Where: NewWhere(AST_WHERE, $4), GroupBy: GroupBy($5), Having: NewWhere(AST_HAVING, $6), OrderBy: $7, Limit: $8, Lock: $9}
-  }
-
-select_statement:
-  SELECT comment_opt distinct_opt select_expression_list from_expression_list_opt where_expression_opt group_by_opt having_opt order_by_opt limit_opt lock_opt
-  {
-    $$ = &Select{Comments: Comments($2), Distinct: $3, SelectExprs: $4, From: NewFrom(AST_FROM, $5), Where: NewWhere(AST_WHERE, $6), GroupBy: GroupBy($7), Having: NewWhere(AST_HAVING, $8), OrderBy: $9, Limit: $10, Lock: $11}
-  }
-| select_statement union_op select_statement %prec UNION
-  {
-    $$ = &Union{Type: $2, Left: $1, Right: $3}
-  }
-
-insert_statement:
-  INSERT comment_opt INTO dml_table_expression column_list_opt row_list on_dup_opt
-  {
-    $$ = &Insert{Comments: Comments($2), Table: $4, Columns: $5, Rows: $6, OnDup: OnDup($7)}
-  }
-| INSERT comment_opt INTO dml_table_expression SET update_list on_dup_opt
-  {
-    cols := make(Columns, 0, len($6))
-    vals := make(ValTuple, 0, len($6))
-    for _, col := range $6 {
-      cols = append(cols, &NonStarExpr{Expr: col.Name})
-      vals = append(vals, col.Expr)
+program
+    :
+    {
+      $$ = nil
+      yylex.(*Lexer).program = $$
     }
-    $$ = &Insert{Comments: Comments($2), Table: $4, Columns: cols, Rows: Values{vals}, OnDup: OnDup($7)}
-  }
+    | procedure_statement
+    {
+      $$ = []Statement{$1}
+      yylex.(*Lexer).program = $$
+    }
+    | procedure_statement ';' program
+    {
+      $$ = append([]Statement{$1}, $3...)
+      yylex.(*Lexer).program = $$
+    }
+    ;
 
-update_statement:
-  UPDATE comment_opt dml_table_expression SET update_list where_expression_opt order_by_opt limit_opt
-  {
-    $$ = &Update{Comments: Comments($2), Table: $3, Exprs: $5, Where: NewWhere(AST_WHERE, $6), OrderBy: $7, Limit: $8}
-  }
+procedure_statement
+    : common_statement
+    {
+        $$ = $1
+    }
+    ;
 
-delete_statement:
-  DELETE comment_opt FROM dml_table_expression where_expression_opt order_by_opt limit_opt
-  {
-    $$ = &Delete{Comments: Comments($2), Table: $4, Where: NewWhere(AST_WHERE, $5), OrderBy: $6, Limit: $7}
-  }
+common_statement
+    : select_query { $$ = $1 }
+    ;
 
-set_statement:
-  SET comment_opt update_list
-  {
-    $$ = &Set{Comments: Comments($2), Exprs: $3}
-  }
+select_query
+    : with_clause select_entity order_by_clause limit_clause offset_clause
+    {
+        $$ = SelectQuery{
+            WithClause:    $1,
+            SelectEntity:  $2,
+            OrderByClause: $3,
+            LimitClause:   $4,
+            OffsetClause:  $5,
+        }
+    }
+    ;
 
-create_statement:
-  CREATE TABLE not_exists_opt ID force_eof
-  {
-    $$ = &DDL{Action: AST_CREATE, NewName: $4}
-  }
-| CREATE constraint_opt INDEX sql_id using_opt ON ID force_eof
-  {
-    // Change this to an alter statement
-    $$ = &DDL{Action: AST_ALTER, Table: $7, NewName: $7}
-  }
-| CREATE VIEW sql_id force_eof
-  {
-    $$ = &DDL{Action: AST_CREATE, NewName: $3}
-  }
-
-alter_statement:
-  ALTER ignore_opt TABLE ID non_rename_operation force_eof
-  {
-    $$ = &DDL{Action: AST_ALTER, Table: $4, NewName: $4}
-  }
-| ALTER ignore_opt TABLE ID RENAME to_opt ID
-  {
-    // Change this to a rename statement
-    $$ = &DDL{Action: AST_RENAME, Table: $4, NewName: $7}
-  }
-| ALTER VIEW sql_id force_eof
-  {
-    $$ = &DDL{Action: AST_ALTER, Table: $3, NewName: $3}
-  }
-
-rename_statement:
-  RENAME TABLE ID TO ID
-  {
-    $$ = &DDL{Action: AST_RENAME, Table: $3, NewName: $5}
-  }
-
-drop_statement:
-  DROP TABLE exists_opt ID
-  {
-    $$ = &DDL{Action: AST_DROP, Table: $4}
-  }
-| DROP INDEX sql_id ON ID
-  {
-    // Change this to an alter statement
-    $$ = &DDL{Action: AST_ALTER, Table: $5, NewName: $5}
-  }
-| DROP VIEW exists_opt sql_id force_eof
-  {
-    $$ = &DDL{Action: AST_DROP, Table: $4}
-  }
-
-analyze_statement:
-  ANALYZE TABLE ID
-  {
-    $$ = &DDL{Action: AST_ALTER, Table: $3, NewName: $3}
-  }
-
-other_statement:
-  SHOW force_eof
-  {
-    $$ = &Other{}
-  }
-| DESCRIBE force_eof
-  {
-    $$ = &Other{}
-  }
-| EXPLAIN force_eof
-  {
-    $$ = &Other{}
-  }
-
-comment_opt:
-  {
-    SetAllowComments(yylex, true)
-  }
-  comment_list
-  {
-    $$ = $2
-    SetAllowComments(yylex, false)
-  }
-
-comment_list:
-  {
-    $$ = nil
-  }
-| comment_list COMMENT
-  {
-    $$ = append($1, $2)
-  }
-
-union_op:
-  UNION
-  {
-    $$ = AST_UNION
-  }
-| UNION ALL
-  {
-    $$ = AST_UNION_ALL
-  }
-| MINUS
-  {
-    $$ = AST_SET_MINUS
-  }
-| EXCEPT
-  {
-    $$ = AST_EXCEPT
-  }
-| INTERSECT
-  {
-    $$ = AST_INTERSECT
-  }
-
-distinct_opt:
-  {
-    $$ = ""
-  }
-| DISTINCT
-  {
-    $$ = AST_DISTINCT
-  }
-
-select_expression_list:
-  select_expression
-  {
-    $$ = SelectExprs{$1}
-  }
-| select_expression_list ',' select_expression
-  {
-    $$ = append($$, $3)
-  }
-
-select_expression:
-  '*'
-  {
-    $$ = &StarExpr{}
-  }
-| expression as_lower_opt
-  {
-    $$ = &NonStarExpr{Expr: $1, As: $2}
-  }
-| ID '.' '*'
-  {
-    $$ = &StarExpr{TableName: $1}
-  }
-
-expression:
-  boolean_expression
-  {
-    $$ = $1
-  }
-| value_expression
-  {
-    $$ = $1
-  }
-
-as_lower_opt:
-  {
-    $$ = nil
-  }
-| sql_id
-  {
-    $$ = $1
-  }
-| AS sql_id
-  {
-    $$ = $2
-  }
-
-table_expression_list:
-  table_expression
-  {
-    $$ = TableExprs{$1}
-  }
-| table_expression_list ',' table_expression
-  {
-    $$ = append($$, $3)
-  }
-
-table_expression:
-  simple_table_expression as_opt index_hint_list
-  {
-    $$ = &AliasedTableExpr{Expr:$1, As: $2, Hints: $3}
-  }
-| '(' table_expression ')'
-  {
-    $$ = &ParenTableExpr{Expr: $2}
-  }
-| table_expression join_type table_expression %prec JOIN
-  {
-    $$ = &JoinTableExpr{LeftExpr: $1, Join: $2, RightExpr: $3}
-  }
-| table_expression join_type table_expression ON boolean_expression %prec JOIN
-  {
-    $$ = &JoinTableExpr{LeftExpr: $1, Join: $2, RightExpr: $3, On: $5}
-  }
-
-as_opt:
-  {
-    $$ = nil
-  }
-| ID
-  {
-    $$ = $1
-  }
-| AS ID
-  {
-    $$ = $2
-  }
-
-join_type:
-  JOIN
-  {
-    $$ = AST_JOIN
-  }
-| STRAIGHT_JOIN
-  {
-    $$ = AST_STRAIGHT_JOIN
-  }
-| LEFT JOIN
-  {
-    $$ = AST_LEFT_JOIN
-  }
-| LEFT OUTER JOIN
-  {
-    $$ = AST_LEFT_JOIN
-  }
-| RIGHT JOIN
-  {
-    $$ = AST_RIGHT_JOIN
-  }
-| RIGHT OUTER JOIN
-  {
-    $$ = AST_RIGHT_JOIN
-  }
-| INNER JOIN
-  {
-    $$ = AST_JOIN
-  }
-| CROSS JOIN
-  {
-    $$ = AST_CROSS_JOIN
-  }
-| NATURAL JOIN
-  {
-    $$ = AST_NATURAL_JOIN
-  }
-
-simple_table_expression:
-ID
-  {
-    $$ = &TableName{Name: $1}
-  }
-| ID '.' ID
-  {
-    $$ = &TableName{Qualifier: $1, Name: $3}
-  }
-| subquery
-  {
-    $$ = $1
-  }
-
-dml_table_expression:
-ID
-  {
-    $$ = &TableName{Name: $1}
-  }
-| ID '.' ID
-  {
-    $$ = &TableName{Qualifier: $1, Name: $3}
-  }
-
-index_hint_list:
-  {
-    $$ = nil
-  }
-| USE INDEX '(' index_list ')'
-  {
-    $$ = &IndexHints{Type: AST_USE, Indexes: $4}
-  }
-| IGNORE INDEX '(' index_list ')'
-  {
-    $$ = &IndexHints{Type: AST_IGNORE, Indexes: $4}
-  }
-| FORCE INDEX '(' index_list ')'
-  {
-    $$ = &IndexHints{Type: AST_FORCE, Indexes: $4}
-  }
-
-index_list:
-  sql_id
-  {
-    $$ = [][]byte{$1}
-  }
-| index_list ',' sql_id
-  {
-    $$ = append($1, $3)
-  }
-
-from_expression_list_opt:
-  {
-    $$ = nil
-  }
-| FROM table_expression_list
-  {
-    $$ = $2
-  }
-
-
-where_expression_opt:
-  {
-    $$ = nil
-  }
-| WHERE boolean_expression
-  {
-    $$ = $2
-  }
-
-boolean_expression:
-  condition
-| boolean_expression AND boolean_expression
-  {
-    $$ = &AndExpr{Left: $1, Right: $3}
-  }
-| boolean_expression OR boolean_expression
-  {
-    $$ = &OrExpr{Left: $1, Right: $3}
-  }
-| NOT boolean_expression
-  {
-    $$ = &NotExpr{Expr: $2}
-  }
-| '(' boolean_expression ')'
-  {
-    $$ = &ParenBoolExpr{Expr: $2}
-  }
-
-condition:
-  value_expression compare value_expression
-  {
-    $$ = &ComparisonExpr{Left: $1, Operator: $2, Right: $3}
-  }
-| value_expression IN col_tuple
-  {
-    $$ = &ComparisonExpr{Left: $1, Operator: AST_IN, Right: $3}
-  }
-| value_expression NOT IN col_tuple
-  {
-    $$ = &ComparisonExpr{Left: $1, Operator: AST_NOT_IN, Right: $4}
-  }
-| value_expression LIKE value_expression
-  {
-    $$ = &ComparisonExpr{Left: $1, Operator: AST_LIKE, Right: $3}
-  }
-| value_expression NOT LIKE value_expression
-  {
-    $$ = &ComparisonExpr{Left: $1, Operator: AST_NOT_LIKE, Right: $4}
-  }
-| value_expression BETWEEN value_expression AND value_expression
-  {
-    $$ = &RangeCond{Left: $1, Operator: AST_BETWEEN, From: $3, To: $5}
-  }
-| value_expression NOT BETWEEN value_expression AND value_expression
-  {
-    $$ = &RangeCond{Left: $1, Operator: AST_NOT_BETWEEN, From: $4, To: $6}
-  }
-| value_expression IS NULL
-  {
-    $$ = &NullCheck{Operator: AST_IS_NULL, Expr: $1}
-  }
-| value_expression IS NOT NULL
-  {
-    $$ = &NullCheck{Operator: AST_IS_NOT_NULL, Expr: $1}
-  }
-| EXISTS subquery
-  {
-    $$ = &ExistsExpr{Subquery: $2}
-  }
-| KEYRANGE '(' value ',' value ')'
-  {
-    $$ = &KeyrangeExpr{Start: $3, End: $5}
-  }
-
-compare:
-  '='
-  {
-    $$ = AST_EQ
-  }
-| '<'
-  {
-    $$ = AST_LT
-  }
-| '>'
-  {
-    $$ = AST_GT
-  }
-| LE
-  {
-    $$ = AST_LE
-  }
-| GE
-  {
-    $$ = AST_GE
-  }
-| NE
-  {
-    $$ = AST_NE
-  }
-| NULL_SAFE_EQUAL
-  {
-    $$ = AST_NSE
-  }
-
-col_tuple:
-  '(' value_expression_list ')'
-  {
-    $$ = ValTuple($2)
-  }
-| subquery
-  {
-    $$ = $1
-  }
-| LIST_ARG
-  {
-    $$ = ListArg($1)
-  }
-
-subquery:
-  '(' select_statement ')'
-  {
-    $$ = &Subquery{$2}
-  }
-
-value_expression_list:
-  value_expression
-  {
-    $$ = ValExprs{$1}
-  }
-| value_expression_list ',' value_expression
-  {
-    $$ = append($1, $3)
-  }
-
-value_expression:
-  value
-  {
-    $$ = $1
-  }
-| column_name
-  {
-    $$ = $1
-  }
-| row_tuple
-  {
-    $$ = $1
-  }
-| value_expression '&' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_BITAND, Right: $3}
-  }
-| value_expression '|' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_BITOR, Right: $3}
-  }
-| value_expression '^' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_BITXOR, Right: $3}
-  }
-| value_expression '+' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_PLUS, Right: $3}
-  }
-| value_expression '-' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_MINUS, Right: $3}
-  }
-| value_expression '*' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_MULT, Right: $3}
-  }
-| value_expression '/' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_DIV, Right: $3}
-  }
-| value_expression '%' value_expression
-  {
-    $$ = &BinaryExpr{Left: $1, Operator: AST_MOD, Right: $3}
-  }
-| unary_operator value_expression %prec UNARY
-  {
-    if num, ok := $2.(NumVal); ok {
-      switch $1 {
-      case '-':
-        $$ = append(NumVal("-"), num...)
-      case '+':
-        $$ = num
-      default:
-        $$ = &UnaryExpr{Operator: $1, Expr: $2}
+select_entity
+    : select_clause from_clause
+    {
+      $$ = SelectEntity{
+        SelectClause: $1,
+        FromClause: $2,
       }
-    } else {
-      $$ = &UnaryExpr{Operator: $1, Expr: $2}
     }
-  }
-| sql_id '(' ')'
-  {
-    $$ = &FuncExpr{Name: $1}
-  }
-| sql_id '(' select_expression_list ')'
-  {
-    $$ = &FuncExpr{Name: $1, Exprs: $3}
-  }
-| sql_id '(' DISTINCT select_expression_list ')'
-  {
-    $$ = &FuncExpr{Name: $1, Distinct: true, Exprs: $4}
-  }
-| keyword_as_func '(' select_expression_list ')'
-  {
-    $$ = &FuncExpr{Name: $1, Exprs: $3}
-  }
-| case_expression
-  {
-    $$ = $1
-  }
+    ;
 
-keyword_as_func:
-  IF
-  {
-    $$ = IF_BYTES
-  }
-| VALUES
-  {
-    $$ = VALUES_BYTES
-  }
-
-unary_operator:
-  '+'
-  {
-    $$ = AST_UPLUS
-  }
-| '-'
-  {
-    $$ = AST_UMINUS
-  }
-| '~'
-  {
-    $$ = AST_TILDA
-  }
-
-case_expression:
-  CASE value_expression_opt when_expression_list else_expression_opt END
-  {
-    $$ = &CaseExpr{Expr: $2, Whens: $3, Else: $4}
-  }
-
-value_expression_opt:
-  {
-    $$ = nil
-  }
-| value_expression
-  {
-    $$ = $1
-  }
-
-when_expression_list:
-  when_expression
-  {
-    $$ = []*When{$1}
-  }
-| when_expression_list when_expression
-  {
-    $$ = append($1, $2)
-  }
-
-when_expression:
-  WHEN boolean_expression THEN value_expression
-  {
-    $$ = &When{Cond: $2, Val: $4}
-  }
-
-else_expression_opt:
-  {
-    $$ = nil
-  }
-| ELSE value_expression
-  {
-    $$ = $2
-  }
-
-column_name:
-  sql_id
-  {
-    $$ = &ColName{Name: $1}
-  }
-| ID '.' sql_id
-  {
-    $$ = &ColName{Qualifier: $1, Name: $3}
-  }
-
-value:
-  STRING
-  {
-    $$ = StrVal($1)
-  }
-| NUMBER
-  {
-    $$ = NumVal($1)
-  }
-| VALUE_ARG
-  {
-    $$ = ValArg($1)
-  }
-| NULL
-  {
-    $$ = &NullVal{}
-  }
-
-group_by_opt:
-  {
-    $$ = nil
-  }
-| GROUP BY value_expression_list
-  {
-    $$ = $3
-  }
-
-having_opt:
-  {
-    $$ = nil
-  }
-| HAVING boolean_expression
-  {
-    $$ = $2
-  }
-
-order_by_opt:
-  {
-    $$ = nil
-  }
-| ORDER BY order_list
-  {
-    $$ = $3
-  }
-
-order_list:
-  order
-  {
-    $$ = OrderBy{$1}
-  }
-| order_list ',' order
-  {
-    $$ = append($1, $3)
-  }
-
-order:
-  value_expression asc_desc_opt
-  {
-    $$ = &Order{Expr: $1, Direction: $2}
-  }
-
-asc_desc_opt:
-  {
-    $$ = AST_ASC
-  }
-| ASC
-  {
-    $$ = AST_ASC
-  }
-| DESC
-  {
-    $$ = AST_DESC
-  }
-
-limit_opt:
-  {
-    $$ = nil
-  }
-| LIMIT value_expression
-  {
-    $$ = &Limit{Rowcount: $2}
-  }
-| LIMIT value_expression ',' value_expression
-  {
-    $$ = &Limit{Offset: $2, Rowcount: $4}
-  }
-
-lock_opt:
-  {
-    $$ = ""
-  }
-| FOR UPDATE
-  {
-    $$ = AST_FOR_UPDATE
-  }
-| LOCK IN sql_id sql_id
-  {
-    if !bytes.Equal($3, SHARE) {
-      yylex.Error("expecting share")
-      return 1
+select_clause
+    : SELECT distinct fields
+    {
+      $$ = SelectClause{
+        BaseExpr:NewBaseExpr($1), Select: $1.Literal, Distinct: $2, Fields: $3 }
     }
-    if !bytes.Equal($4, MODE) {
-      yylex.Error("expecting mode")
-      return 1
+    ;
+
+from_clause
+    : { $$ = nil }
+    | FROM tables
+    {
+      $$ = FromClause{From: $1.Literal, Tables: $2}
     }
-    $$ = AST_SHARE_MODE
-  }
+    ;
 
-column_list_opt:
+order_by_clause
+    : { $$ = nil }
+    | ORDER BY order_items
+    {
+      $$ = OrderByClause{OrderBy: $1.Literal + " " + $2.Literal, Items: $3}
+    }
+
+order_items
+    : order_item { $$ = []QueryExpression{$1} }
+    | order_item ',' order_items { $$ = append([]QueryExpression{$1}, $3...)}
+    ;
+
+order_item
+    : order_value order_direction { $$ = OrderItem{Value: $1, Direction: $2}}
+    | order_value order_direction NULLS order_null_position
+    {
+      $$ = OrderItem{Value: $1, Direction: $2, Nulls: $3.Literal, Position: $4}
+    }
+    ;
+
+order_value
+    : value { $$ = $1 }
+    | analytic_function { $$ = $1 }
+    ;
+
+order_direction
+    : { $$ = Token{} }
+    | ASC { $$ = $1 }
+    | DESC { $$ = $1 }
+    ;
+
+order_null_position
+    : FIRST { $$ = $1 }
+    | LAST { $$ = $1 }
+    ;
+
+limit_clause
+    : { $$ = nil }
+    | LIMIT value limit_with
+    {
+      $$ = LimitClause{BaseExpr: NewBaseExpr($1), Limit: $1.Literal, Value: $2, With: $3}
+    }
+    | LIMIT value PERCENT limit_with
+    {
+      $$ = LimitClause{BaseExpr: NewBaseExpr($1), Limit: $1.Literal, Value: $2, Percent: $3.Literal, With: $4}
+    }
+    ;
+
+limit_with
+    :
+    {
+        $$ = nil
+    }
+    | WITH TIES
+    {
+        $$ = LimitWith{With: $1.Literal, Type: $2}
+    }
+
+offset_clause
+    : { $$ = nil }
+    | OFFSET value
+    {
+      $$ = OffsetClause{BaseExpr: NewBaseExpr($1), Offset: $1.Literal, Value: $2 }
+    }
+    ;
+
+field_object
+    : value { $$ = $1 }
+    | analytic_function { $$ = $1 }
+
+field
+    : field_object { $$ = Field{Object: $1}}
+    | field_object AS identifier
+    {
+      $$ = Field{Object: $1, As: $2.Literal, Alias: $3}
+    }
+    | wildcard { $$ = Field{Object: $1} }
+    ;
+
+tables
+    : table { $$ = []QueryExpression{$1} }
+    | table ',' tables
+    {
+      $$ = append([]QueryExpression{$1}, $3...)
+    }
+
+table
+    : identified_table { $$ = $1 }
+    | virtual_table_object { $$ = Table{Object: $1} }
+    | virtual_table_object identifier { $$ = Table{Object: $1, Alias: $2} }
+    // add joins here
+    | '(' table ')' { $$ = Parentheses{Expr: $2}}
+    ;
+
+table_identifier
+    : identifier
+    {
+        $$ = $1
+    }
+    | STDIN
+    {
+        $$ = Stdin{BaseExpr: NewBaseExpr($1), Stdin: $1.Literal}
+    }
+
+identified_table
+    : table_identifier
+    {
+        $$ = Table{Object: $1}
+    }
+    | table_identifier identifier
+    {
+        $$ = Table{Object: $1, Alias: $2}
+    }
+    | table_identifier AS identifier
+    {
+        $$ = Table{Object: $1, As: $2.Literal, Alias: $3}
+    }
+virtual_table_object
+    : subquery
+    {
+        $$ = $1
+    }
+    ;
+
+with_clause
+    : { $$ = nil }
+    | WITH inline_tables { $$ = WithClause{With: $1.Literal, InlineTables: $2} }
+    ;
+
+inline_table
+    : recursive identifier AS '(' select_query ')'
+    {
+        $$ = InlineTable{Recursive: $1, Name: $2, As: $3.Literal, Query: $5.(SelectQuery)}
+    }
+    | recursive identifier '(' identifiers ')' AS '(' select_query ')'
+    {
+        $$ = InlineTable{Recursive: $1, Name: $2, Fields: $4, As: $6.Literal, Query: $8.(SelectQuery)}
+    }
+    ;
+
+inline_tables
+    : inline_table
+    {
+        $$ = []QueryExpression{$1}
+    }
+    | inline_table ',' inline_tables
+    {
+        $$ = append([]QueryExpression{$1}, $3...)
+    }
+    ;
+
+identifiers
+    : identifier { $$ = []QueryExpression{$1} }
+    | identifier ',' identifiers { $$ = append([]QueryExpression{$1}, $3...)}
+    ;
+
+fields
+    : field { $$ = []QueryExpression{$1} }
+    | field ',' fields { $$ = append([]QueryExpression{$1}, $3...)}
+    ;
+
+values
+    : value { $$ = []QueryExpression{$1} }
+    | value ',' values { $$ = append([]QueryExpression{$1}, $3...)}
+    ;
+
+analytic_function
+    : identifier '(' arguments ')'
+    {
+      $$ = AnalyticFunction{BaseExpr: $1.BaseExpr, Name: $1.Literal, Args: $3}
+    }
+    | COUNT '(' distinct arguments ')'
+    {
+      $$ = AnalyticFunction{BaseExpr: NewBaseExpr($1), Name: $1.Literal, Distinct: $3, Args: $4}
+    }
+    | COUNT '(' distinct wildcard ')'
+    {
+      $$ = AnalyticFunction{BaseExpr: NewBaseExpr($1), Name: $1.Literal, Distinct: $3, Args: []QueryExpression{$4}}
+    }
+    ;
+
+// analytic_clause
+//     : partition_clause order_by_clause
+//     {
+//         $$ = AnalyticClause{PartitionClause: $1, OrderByClause: $2}
+//     }
+//     ;
+
+// partition_clause
+//     :
+//     {
+//         $$ = nil
+//     }
+//     | PARTITION BY values
+//     {
+//         $$ = PartitionClause{PartitionBy: $1.Literal + " " + $2.Literal, Values: $3}
+//     }
+
+arguments
+    : { $$ = nil }
+    | values { $$ = $1 }
+    ;
+
+wildcard
+    : '*'
+    {
+        $$ = AllColumns{BaseExpr: NewBaseExpr($1)}
+    }
+    ;
+
+row_value
+    : '(' values ')'
+    {
+      $$ = RowValue{BaseExpr: NewBaseExpr($1), Value: ValueList{Values: $2}}
+    }
+    | subquery
+    {
+      $$ = RowValue{BaseExpr: $1.GetBaseExpr(), Value: $1}
+    }
+    ;
+
+row_values
+    : row_value
+    {
+      $$ = []QueryExpression{$1}
+    }
+    | row_value ',' row_values
+    {
+      $$ = append([]QueryExpression{$1}, $3...)
+    }
+
+subquery
+    : '(' select_query ')'
+    {
+        $$ = Subquery{BaseExpr: NewBaseExpr($1), Query: $2.(SelectQuery)}
+    }
+    ;
+
+string_operation
+    : value STRING_OP value
+    {
+      var item1 []QueryExpression
+      var item2 []QueryExpression
+
+      c1, ok := $1.(Concat)
+      if ok {
+        item1 = c1.Items
+      } else {
+        item1 = []QueryExpression{$1}
+      }
+
+      c2, ok := $3.(Concat)
+      if ok {
+        item2 = c2.Items
+      } else {
+        item2 = []QueryExpression{$3}
+      }
+
+      $$ = Concat{Items: append(item1, item2...)}
+    }
+    ;
+
+comparison
+    : value COMPARISON_OP value
+    {
+      $$ = Comparison{LHS: $1, Operator: $2.Literal, RHS: $3 }
+    }
+    | row_value COMPARISON_OP row_value
+    {
+      $$ = Comparison{LHS: $1, Operator: $2.Literal, RHS: $3 }
+    }
+    | value '=' value
+    {
+      $$ = Comparison{LHS: $1, Operator: "=", RHS: $3 }
+    }
+    | row_value '=' row_value
+    {
+      $$ = Comparison{LHS: $1, Operator: "=", RHS: $3 }
+    }
+    | value IN row_value
+    {
+      $$ = In{In: $2.Literal, LHS: $1, Values: $3 }
+    }
+    | value NOT IN row_value
+    {
+      $$ = In{In: $3.Literal, LHS: $1, Values: $4, Negation: $2 }
+    }
+    // Lots more to do here
+    | EXISTS subquery
+    {
+      $$ = Exists{Exists: $1.Literal, Query: $2.(Subquery)}
+    }
+
+field_references
+    : field_reference
+    {
+        $$ = []QueryExpression{$1}
+    }
+    | field_reference ',' field_references
+    {
+        $$ = append([]QueryExpression{$1}, $3...)
+    }
+
+field_reference
+    : identifier
+    {
+      $$ = FieldReference{BaseExpr: $1.BaseExpr, Column: $1}
+    }
+    | identifier '.' identifier
+    {
+      $$ = FieldReference{BaseExpr: $1.BaseExpr, View: $1, Column: $3}
+    }
+    | identifier '.' INTEGER
+    {
+        $$ = ColumnNumber{BaseExpr: $1.BaseExpr, View: $1, Number: value.NewIntegerFromString($3.Literal)}
+    }
+    ;
+
+arithmetic
+    : value '+' value { $$ = Arithmetic{LHS: $1, Operator: int('+'), RHS: $3} }
+    | value '-' value { $$ = Arithmetic{LHS: $1, Operator: int('-'), RHS: $3} }
+    | value '*' value { $$ = Arithmetic{LHS: $1, Operator: int('*'), RHS: $3} }
+    | value '/' value { $$ = Arithmetic{LHS: $1, Operator: int('/'), RHS: $3} }
+    | value '%' value { $$ = Arithmetic{LHS: $1, Operator: int('%'), RHS: $3} }
+    | '-' value %prec UMINUS { $$ = UnaryArithmetic{Operand: $2, Operator: $1} }
+    | '+' value %prec UMINUS { $$ = UnaryArithmetic{Operand: $2, Operator: $1} }
+    ;
+
+logic
+    : value OR value
+    {
+      $$ = Logic{LHS: $1, Operator: $2, RHS: $3 }
+    }
+    | value AND value
+    {
+      $$ = Logic{LHS: $1, Operator: $2, RHS: $3 }
+    }
+    | NOT value { $$ = UnaryLogic{Operand: $2, Operator: $1 }}
+    | '!' value { $$ = UnaryLogic{Operand: $2, Operator: $1 }}
+    ;
+
+aggregate_function
+  : identifier '(' distinct arguments ')'
   {
-    $$ = nil
+    $$ = AggregateFunction{BaseExpr: $1.BaseExpr, Name: $1.Literal, Distinct: $3, Args: $4 }
   }
-| '(' column_list ')'
+  | AGGREGATE_FUNCTION '(' distinct arguments ')'
   {
-    $$ = $2
+    $$ = AggregateFunction{BaseExpr: NewBaseExpr($1), Name: $1.Literal, Distinct: $3, Args: $4}
   }
-
-column_list:
-  column_name
+  | COUNT '(' distinct arguments ')'
   {
-    $$ = Columns{&NonStarExpr{Expr: $1}}
+    $$ = AggregateFunction{BaseExpr: NewBaseExpr($1), Name: $1.Literal, Distinct: $3, Args: $4}
   }
-| column_list ',' column_name
+  | COUNT '(' distinct wildcard ')'
   {
-    $$ = append($$, &NonStarExpr{Expr: $3})
+    $$ = AggregateFunction{BaseExpr: NewBaseExpr($1), Name: $1.Literal, Distinct: $3, Args: []QueryExpression{$4}}
   }
+  ;
 
-on_dup_opt:
-  {
-    $$ = nil
-  }
-| ON DUPLICATE KEY UPDATE update_list
-  {
-    $$ = $5
-  }
+identifier
+    : IDENTIFIER
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | TIES
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | NULLS
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | TABLES
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | VIEWS
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | CURSORS
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | FUNCTIONS
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | ROWS
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | FIELDS
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | COUNT
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | LISTAGG
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | AGGREGATE_FUNCTION
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | ANALYTIC_FUNCTION
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | FUNCTION_NTH
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | FUNCTION_WITH_INS
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    | ERROR
+    {
+        $$ = Identifier{BaseExpr: NewBaseExpr($1), Literal: $1.Literal, Quoted: $1.Quoted}
+    }
+    ;
 
-row_list:
-  VALUES tuple_list
-  {
-    $$ = $2
-  }
-| select_statement
-  {
-    $$ = $1
-  }
+null
+    : NULL { $$ = NewNullValueFromString($1.Literal) }
 
-tuple_list:
-  row_tuple
-  {
-    $$ = Values{$1}
-  }
-| tuple_list ',' row_tuple
-  {
-    $$ = append($1, $3)
-  }
+variable
+    : VARIABLE
+      {
+        $$ = Variable{BaseExpr: NewBaseExpr($1), Name: $1.Literal}
+      }
+    ;
 
-row_tuple:
-  '(' value_expression_list ')'
-  {
-    $$ = ValTuple($2)
-  }
-| subquery
-  {
-    $$ = $1
-  }
+variables
+    : variable
+      {
+        $$ = []Variable{$1}
+      }
+    | variable ',' variables { $$ = append([]Variable{$1}, $3...) }
+    ;
 
-update_list:
-  update_expression
-  {
-    $$ = UpdateExprs{$1}
-  }
-| update_list ',' update_expression
-  {
-    $$ = append($1, $3)
-  }
+variable_substitution
+    : variable SUBSTITUTION_OP value
+    {
+      $$ = VariableSubstitution{Variable: $1, Value: $3}
+    }
+    ;
 
-update_expression:
-  column_name '=' value_expression
-  {
-    $$ = &UpdateExpr{Name: $1, Expr: $3}
-  }
+ternary
+    : TERNARY
+    {
+        $$ = NewTernaryValueFromString($1.Literal)
+    }
+    ;
 
-exists_opt:
-  { $$ = struct{}{} }
-| IF EXISTS
-  { $$ = struct{}{} }
+value
+    : field_reference { $$ = $1 }
+    | primitive_type { $$ = $1 }
+    | arithmetic { $$ = $1 }
+    | string_operation { $$ = $1 }
+    | subquery { $$ = $1 }
+    | aggregate_function { $$ = $1 }
+    | comparison { $$ = $1 }
+    | logic { $$ = $1 }
+    | variable { $$ = $1 }
+    | variable_substitution { $$ = $1 }
+    | '(' value ')' { $$ = Parentheses{Expr: $2} }
+    ;
 
-not_exists_opt:
-  { $$ = struct{}{} }
-| IF NOT EXISTS
-  { $$ = struct{}{} }
+primitive_type
+    : STRING
+    {
+        $$ = NewStringValue($1.Literal)
+    }
+    | INTEGER
+    {
+        $$ = NewIntegerValueFromString($1.Literal)
+    }
+    | FLOAT
+    {
+        $$ = NewFloatValueFromString($1.Literal)
+    }
+    | ternary
+    {
+        $$ = $1
+    }
+    | DATETIME
+    {
+        $$ = NewDatetimeValueFromString($1.Literal)
+    }
+    | null
+    {
+        $$ = $1
+    }
+    ;
 
-ignore_opt:
-  { $$ = struct{}{} }
-| IGNORE
-  { $$ = struct{}{} }
+distinct
+    : { $$ = Token{} }
+    | DISTINCT { $$ = $1 }
+    ;
 
-non_rename_operation:
-  ALTER
-  { $$ = struct{}{} }
-| DEFAULT
-  { $$ = struct{}{} }
-| DROP
-  { $$ = struct{}{} }
-| ORDER
-  { $$ = struct{}{} }
-| ID
-  { $$ = struct{}{} }
+all
+    : { $$ = Token{} }
+    | ALL { $$ = $1 }
 
-to_opt:
-  { $$ = struct{}{} }
-| TO
-  { $$ = struct{}{} }
+as
+    : { $$ = Token{} }
+    | AS { $$ = $1 }
 
-constraint_opt:
-  { $$ = struct{}{} }
-| UNIQUE
-  { $$ = struct{}{} }
+comparison_operator
+    : COMPARISON_OP
+    {
+        $$ = $1
+    }
+    | '='
+    {
+        $1.Token = COMPARISON_OP
+        $$ = $1
+    }
 
-using_opt:
-  { $$ = struct{}{} }
-| USING sql_id
-  { $$ = struct{}{} }
+%%
 
-sql_id:
-  ID
-  {
-    $$ = $1
-  }
+func SetDebugLevel(level int, verbose bool) {
+	yyDebug        = level
+	yyErrorVerbose = verbose
+}
 
-force_eof:
-{
-  ForceEOF(yylex)
+func Parse(s string, sourceFile string) ([]Statement, error) {
+    l := new(Lexer)
+    l.Init(s, sourceFile)
+    yyParse(l)
+    return l.program, l.err
 }

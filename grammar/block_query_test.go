@@ -12,7 +12,9 @@ func TestBlockQuery_Select(t *testing.T) {
 		query          string
 		expectedASTLen int
 	}{
-		{"SELECT * FROM transactions", 27},
+		{"Hello world", 29},
+		{"SELECT * from transactions;", 28},
+		{"SELECT id FROM transactions", 27},
 		{"select * FROM transactions LIMIT 10", 34},
 		{"select * FROM transactions ORDER BY id ASC", 48},
 		{"select * FROM transactions ORDER BY id ASC LIMIT 10", 48}, // ordering doesn't matter
@@ -25,12 +27,13 @@ func TestBlockQuery_Select(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		q, err := grammar.Parse(tt.query)
+		q, err := grammar.Parse(tt.query, "/tmp/test.go")
 
 		if err != nil {
 			t.Errorf(err.Error())
 		}
 		// fmt.Printf("q: %#v\n", q)
 		fmt.Printf("q: %#v\n", q)
+		t.Error()
 	}
 }
