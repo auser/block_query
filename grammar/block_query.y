@@ -14,7 +14,6 @@ import (
 
 %union {
   program     []Statement
-  empty       struct{}
   statement   Statement
   queryexpr   QueryExpression
   queryexprs  []QueryExpression
@@ -33,9 +32,8 @@ import (
 
 %token<token> IDENTIFIER STRING INTEGER FLOAT BOOLEAN TERNARY DATETIME VARIABLE FLAG
 
-%token<token> SELECT FROM WITH ORDER BY LIMIT OFFSET PARTITION TABLES AS
+%token<token> SELECT FROM WITH ORDER BY LIMIT OFFSET PARTITION TABLES
 %token<token> VIEWS CURSORS FUNCTIONS FUNCTION_NTH FUNCTION_WITH_INS
-%token<token> COMPARISON_OP STRING_OP SUBSTITUTION_OP PERCENT STDIN
 
 %token<token> AND OR NOT
 %token<token> ASC DESC
@@ -43,9 +41,11 @@ import (
 %token<token> ERROR UMINUS
 %token<token> COUNT LISTAGG ROWS
 %token<token> AGGREGATE_FUNCTION ANALYTIC_FUNCTION
-%token<token> ALL NULLS NULL IN EXISTS TIES FIELDS
-%token<token> '*' ';' '=' '(' ')' '-' '+' '!'
+%token<token> NULLS NULL IN EXISTS TIES FIELDS
+%token<token> ALL AS
+%token<token> COMPARISON_OP STRING_OP PERCENT STDIN SUBSTITUTION_OP
 %token<token> DISTINCT
+%token<token> ';' '*' '=' '-' '+' '!' '(' ')'
 
 %type <program> program
 
@@ -86,7 +86,6 @@ import (
 %type<token>        order_null_position
 %type<queryexpr>    limit_with
 %type<queryexpr>    offset_clause
-%type<queryexpr>    field_reference
 %type<queryexpr>    primitive_type
 %type<queryexpr>   arithmetic
 %type<queryexpr>   ternary
@@ -110,12 +109,8 @@ import (
 
 %type<identifier>  identifier
 
-%type<token>       all
 %type<token>       distinct
-%type<token>       as
 %type<token>       comparison_operator
-
-
 
 %right SUBSTITUTION_OP
 %left UNION EXCEPT
@@ -134,8 +129,7 @@ import (
 
 %%
 
-program
-    :
+program:
     {
       $$ = nil
       yylex.(*Lexer).program = $$
@@ -174,6 +168,15 @@ select_query
             OffsetClause:  $5,
         }
     }
+    | select_entity order_by_clause limit_clause offset_clause
+    {
+      $$ = SelectQuery{
+        SelectEntity: $1,
+        OrderByClause: $2,
+        LimitClause: $3,
+        OffsetClause: $4,
+      }
+    }
     ;
 
 select_entity
@@ -194,9 +197,7 @@ select_clause
     }
     ;
 
-from_clause
-    : { $$ = nil }
-    | FROM tables
+from_clause: FROM tables
     {
       $$ = FromClause{From: $1.Literal, Tables: $2}
     }
@@ -281,8 +282,13 @@ field
     | wildcard { $$ = Field{Object: $1} }
     ;
 
-tables
-    : table { $$ = []QueryExpression{$1} }
+fields:
+    field { $$ = []QueryExpression{$1} }
+    | field ',' fields { $$ = append([]QueryExpression{$1}, $3...)}
+    ;
+
+tables:
+    table { $$ = []QueryExpression{$1} }
     | table ',' tables
     {
       $$ = append([]QueryExpression{$1}, $3...)
@@ -306,8 +312,7 @@ table_identifier
         $$ = Stdin{BaseExpr: NewBaseExpr($1), Stdin: $1.Literal}
     }
 
-identified_table
-    : table_identifier
+identified_table: table_identifier
     {
         $$ = Table{Object: $1}
     }
@@ -327,12 +332,11 @@ virtual_table_object
     ;
 
 with_clause
-    : { $$ = nil }
+    :{ $$ = nil }
     | WITH inline_tables { $$ = WithClause{With: $1.Literal, InlineTables: $2} }
     ;
 
-inline_table
-    : recursive identifier AS '(' select_query ')'
+inline_table: recursive identifier AS '(' select_query ')'
     {
         $$ = InlineTable{Recursive: $1, Name: $2, As: $3.Literal, Query: $5.(SelectQuery)}
     }
@@ -358,10 +362,6 @@ identifiers
     | identifier ',' identifiers { $$ = append([]QueryExpression{$1}, $3...)}
     ;
 
-fields
-    : field { $$ = []QueryExpression{$1} }
-    | field ',' fields { $$ = append([]QueryExpression{$1}, $3...)}
-    ;
 
 values
     : value { $$ = []QueryExpression{$1} }
@@ -421,10 +421,8 @@ row_value
     {
       $$ = RowValue{BaseExpr: $1.GetBaseExpr(), Value: $1}
     }
-    ;
 
-row_values
-    : row_value
+row_values: row_value
     {
       $$ = []QueryExpression{$1}
     }
@@ -504,6 +502,7 @@ field_references
     {
         $$ = append([]QueryExpression{$1}, $3...)
     }
+    ;
 
 field_reference
     : identifier
@@ -639,8 +638,8 @@ variable
       }
     ;
 
-variables
-    : variable
+variables:
+    variable
       {
         $$ = []Variable{$1}
       }
@@ -707,22 +706,17 @@ distinct
     | DISTINCT { $$ = $1 }
     ;
 
-all
-    : { $$ = Token{} }
-    | ALL { $$ = $1 }
+// all: { $$ = Token{} }
+//     | ALL { $$ = $1 }
+//     ;
 
-as
-    : { $$ = Token{} }
-    | AS { $$ = $1 }
+// as: { $$ = Token{} }
+//     | AS { $$ = $1 }
+//     ;
 
-comparison_operator
-    : COMPARISON_OP
+comparison_operator: '='
     {
-        $$ = $1
-    }
-    | '='
-    {
-        $1.Token = COMPARISON_OP
+        $1.Token = '='
         $$ = $1
     }
 

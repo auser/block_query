@@ -1,18 +1,21 @@
 
+0: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
 state 0
 	$accept: .program $end 
 	program: .    (1)
-	with_clause: .    (48)
+	with_clause: .    (50)
 
-	SELECT  reduce 48 (src line 329)
-	WITH  shift 6
-	.  reduce 1 (src line 137)
+	SELECT  shift 9
+	WITH  shift 7
+	.  reduce 1 (src line 132)
 
 	program  goto 1
 	procedure_statement  goto 2
 	common_statement  goto 3
 	select_query  goto 4
+	select_clause  goto 8
 	with_clause  goto 5
+	select_entity  goto 6
 
 state 1
 	$accept:  program.$end 
@@ -25,621 +28,645 @@ state 2
 	program:  procedure_statement.    (2)
 	program:  procedure_statement.';' program 
 
-	';'  shift 7
-	.  reduce 2 (src line 143)
+	';'  shift 10
+	.  reduce 2 (src line 137)
 
 
 state 3
 	procedure_statement:  common_statement.    (4)
 
-	.  reduce 4 (src line 155)
+	.  reduce 4 (src line 149)
 
 
 state 4
 	common_statement:  select_query.    (5)
 
-	.  reduce 5 (src line 162)
+	.  reduce 5 (src line 156)
 
 
 state 5
 	select_query:  with_clause.select_entity order_by_clause limit_clause offset_clause 
 
-	SELECT  shift 10
+	SELECT  shift 9
 	.  error
 
-	select_clause  goto 9
-	select_entity  goto 8
+	select_clause  goto 8
+	select_entity  goto 11
 
 state 6
-	with_clause:  WITH.inline_tables 
-
-	recursive  shift 13
-	.  error
-
-	inline_table  goto 12
-	inline_tables  goto 11
-
-state 7
-	program:  procedure_statement ';'.program 
-	program: .    (1)
-	with_clause: .    (48)
-
-	SELECT  reduce 48 (src line 329)
-	WITH  shift 6
-	.  reduce 1 (src line 137)
-
-	program  goto 14
-	procedure_statement  goto 2
-	common_statement  goto 3
-	select_query  goto 4
-	with_clause  goto 5
-
-state 8
-	select_query:  with_clause select_entity.order_by_clause limit_clause offset_clause 
+	select_query:  select_entity.order_by_clause limit_clause offset_clause 
 	order_by_clause: .    (11)
 
-	ORDER  shift 16
-	.  reduce 11 (src line 205)
+	ORDER  shift 13
+	.  reduce 11 (src line 206)
 
-	order_by_clause  goto 15
+	order_by_clause  goto 12
 
-state 9
+state 7
+	with_clause:  WITH.inline_tables 
+
+	recursive  shift 16
+	.  error
+
+	inline_table  goto 15
+	inline_tables  goto 14
+
+state 8
 	select_entity:  select_clause.from_clause 
-	from_clause: .    (9)
 
 	FROM  shift 18
-	.  reduce 9 (src line 197)
+	.  error
 
 	from_clause  goto 17
 
-state 10
+state 9
 	select_clause:  SELECT.distinct fields 
 	distinct: .    (138)
 
 	DISTINCT  shift 20
-	.  reduce 138 (src line 705)
+	.  reduce 138 (src line 704)
 
 	distinct  goto 19
 
+10: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
+state 10
+	program:  procedure_statement ';'.program 
+	program: .    (1)
+	with_clause: .    (50)
+
+	SELECT  shift 9
+	WITH  shift 7
+	.  reduce 1 (src line 132)
+
+	program  goto 21
+	procedure_statement  goto 2
+	common_statement  goto 3
+	select_query  goto 4
+	select_clause  goto 8
+	with_clause  goto 5
+	select_entity  goto 6
+
 state 11
-	with_clause:  WITH inline_tables.    (49)
+	select_query:  with_clause select_entity.order_by_clause limit_clause offset_clause 
+	order_by_clause: .    (11)
 
-	.  reduce 49 (src line 331)
+	ORDER  shift 13
+	.  reduce 11 (src line 206)
 
+	order_by_clause  goto 22
 
 state 12
-	inline_tables:  inline_table.    (52)
-	inline_tables:  inline_table.',' inline_tables 
+	select_query:  select_entity order_by_clause.limit_clause offset_clause 
+	limit_clause: .    (24)
 
-	','  shift 21
-	.  reduce 52 (src line 345)
+	LIMIT  shift 24
+	.  reduce 24 (src line 242)
 
+	limit_clause  goto 23
 
 state 13
-	inline_table:  recursive.identifier AS '(' select_query ')' 
-	inline_table:  recursive.identifier '(' identifiers ')' AS '(' select_query ')' 
+	order_by_clause:  ORDER.BY order_items 
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
+	BY  shift 25
 	.  error
 
-	identifier  goto 22
 
 state 14
-	program:  procedure_statement ';' program.    (3)
+	with_clause:  WITH inline_tables.    (51)
 
-	.  reduce 3 (src line 148)
+	.  reduce 51 (src line 336)
 
 
 state 15
-	select_query:  with_clause select_entity order_by_clause.limit_clause offset_clause 
-	limit_clause: .    (24)
+	inline_tables:  inline_table.    (54)
+	inline_tables:  inline_table.',' inline_tables 
 
-	LIMIT  shift 40
-	.  reduce 24 (src line 241)
+	','  shift 26
+	.  reduce 54 (src line 349)
 
-	limit_clause  goto 39
 
 state 16
-	order_by_clause:  ORDER.BY order_items 
+	inline_table:  recursive.identifier AS '(' select_query ')' 
+	inline_table:  recursive.identifier '(' identifiers ')' AS '(' select_query ')' 
 
-	BY  shift 41
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
 	.  error
 
+	identifier  goto 27
 
 state 17
-	select_entity:  select_clause from_clause.    (7)
+	select_entity:  select_clause from_clause.    (8)
 
-	.  reduce 7 (src line 179)
+	.  reduce 8 (src line 182)
 
 
 state 18
 	from_clause:  FROM.tables 
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	STDIN  shift 50
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 46
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
+	STDIN  shift 52
+	'('  shift 48
 	.  error
 
-	tables  goto 42
-	table  goto 43
-	subquery  goto 48
-	table_identifier  goto 47
-	identified_table  goto 44
-	virtual_table_object  goto 45
-	identifier  goto 49
+	tables  goto 44
+	table  goto 45
+	subquery  goto 50
+	table_identifier  goto 49
+	identified_table  goto 46
+	virtual_table_object  goto 47
+	identifier  goto 51
 
 state 19
 	select_clause:  SELECT distinct.fields 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 70
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'*'  shift 57
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 72
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'*'  shift 59
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_object  goto 53
-	field  goto 52
-	fields  goto 51
-	field_reference  goto 58
-	value  goto 55
-	wildcard  goto 54
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	analytic_function  goto 56
-	identifier  goto 69
+	field_object  goto 55
+	field  goto 54
+	fields  goto 53
+	field_reference  goto 60
+	value  goto 57
+	wildcard  goto 56
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	analytic_function  goto 58
+	identifier  goto 71
 
 state 20
 	distinct:  DISTINCT.    (139)
 
-	.  reduce 139 (src line 707)
+	.  reduce 139 (src line 706)
 
 
 state 21
-	inline_tables:  inline_table ','.inline_tables 
+	program:  procedure_statement ';' program.    (3)
 
-	recursive  shift 13
-	.  error
+	.  reduce 3 (src line 142)
 
-	inline_table  goto 12
-	inline_tables  goto 87
 
 state 22
-	inline_table:  recursive identifier.AS '(' select_query ')' 
-	inline_table:  recursive identifier.'(' identifiers ')' AS '(' select_query ')' 
+	select_query:  with_clause select_entity order_by_clause.limit_clause offset_clause 
+	limit_clause: .    (24)
 
-	AS  shift 88
-	'('  shift 89
-	.  error
+	LIMIT  shift 24
+	.  reduce 24 (src line 242)
 
+	limit_clause  goto 89
 
 state 23
-	identifier:  IDENTIFIER.    (99)
-
-	.  reduce 99 (src line 565)
-
-
-state 24
-	identifier:  TIES.    (100)
-
-	.  reduce 100 (src line 570)
-
-
-state 25
-	identifier:  NULLS.    (101)
-
-	.  reduce 101 (src line 574)
-
-
-state 26
-	identifier:  TABLES.    (102)
-
-	.  reduce 102 (src line 578)
-
-
-state 27
-	identifier:  VIEWS.    (103)
-
-	.  reduce 103 (src line 582)
-
-
-state 28
-	identifier:  CURSORS.    (104)
-
-	.  reduce 104 (src line 586)
-
-
-state 29
-	identifier:  FUNCTIONS.    (105)
-
-	.  reduce 105 (src line 590)
-
-
-state 30
-	identifier:  ROWS.    (106)
-
-	.  reduce 106 (src line 594)
-
-
-state 31
-	identifier:  FIELDS.    (107)
-
-	.  reduce 107 (src line 598)
-
-
-state 32
-	identifier:  COUNT.    (108)
-
-	.  reduce 108 (src line 602)
-
-
-state 33
-	identifier:  LISTAGG.    (109)
-
-	.  reduce 109 (src line 606)
-
-
-state 34
-	identifier:  AGGREGATE_FUNCTION.    (110)
-
-	.  reduce 110 (src line 610)
-
-
-state 35
-	identifier:  ANALYTIC_FUNCTION.    (111)
-
-	.  reduce 111 (src line 614)
-
-
-state 36
-	identifier:  FUNCTION_NTH.    (112)
-
-	.  reduce 112 (src line 618)
-
-
-state 37
-	identifier:  FUNCTION_WITH_INS.    (113)
-
-	.  reduce 113 (src line 622)
-
-
-state 38
-	identifier:  ERROR.    (114)
-
-	.  reduce 114 (src line 626)
-
-
-state 39
-	select_query:  with_clause select_entity order_by_clause limit_clause.offset_clause 
+	select_query:  select_entity order_by_clause limit_clause.offset_clause 
 	offset_clause: .    (29)
 
 	OFFSET  shift 91
-	.  reduce 29 (src line 263)
+	.  reduce 29 (src line 264)
 
 	offset_clause  goto 90
 
-state 40
+state 24
 	limit_clause:  LIMIT.value limit_with 
 	limit_clause:  LIMIT.value PERCENT limit_with 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
+	field_reference  goto 60
 	value  goto 92
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 41
+state 25
 	order_by_clause:  ORDER BY.order_items 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 70
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 72
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
+	field_reference  goto 60
 	value  goto 98
 	order_items  goto 95
 	order_item  goto 96
-	row_value  goto 80
+	row_value  goto 82
 	order_value  goto 97
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	analytic_function  goto 99
-	identifier  goto 69
+	identifier  goto 71
+
+state 26
+	inline_tables:  inline_table ','.inline_tables 
+
+	recursive  shift 16
+	.  error
+
+	inline_table  goto 15
+	inline_tables  goto 100
+
+state 27
+	inline_table:  recursive identifier.AS '(' select_query ')' 
+	inline_table:  recursive identifier.'(' identifiers ')' AS '(' select_query ')' 
+
+	AS  shift 101
+	'('  shift 102
+	.  error
+
+
+state 28
+	identifier:  IDENTIFIER.    (99)
+
+	.  reduce 99 (src line 564)
+
+
+state 29
+	identifier:  TIES.    (100)
+
+	.  reduce 100 (src line 569)
+
+
+state 30
+	identifier:  NULLS.    (101)
+
+	.  reduce 101 (src line 573)
+
+
+state 31
+	identifier:  TABLES.    (102)
+
+	.  reduce 102 (src line 577)
+
+
+state 32
+	identifier:  VIEWS.    (103)
+
+	.  reduce 103 (src line 581)
+
+
+state 33
+	identifier:  CURSORS.    (104)
+
+	.  reduce 104 (src line 585)
+
+
+state 34
+	identifier:  FUNCTIONS.    (105)
+
+	.  reduce 105 (src line 589)
+
+
+state 35
+	identifier:  ROWS.    (106)
+
+	.  reduce 106 (src line 593)
+
+
+state 36
+	identifier:  FIELDS.    (107)
+
+	.  reduce 107 (src line 597)
+
+
+state 37
+	identifier:  COUNT.    (108)
+
+	.  reduce 108 (src line 601)
+
+
+state 38
+	identifier:  LISTAGG.    (109)
+
+	.  reduce 109 (src line 605)
+
+
+state 39
+	identifier:  AGGREGATE_FUNCTION.    (110)
+
+	.  reduce 110 (src line 609)
+
+
+state 40
+	identifier:  ANALYTIC_FUNCTION.    (111)
+
+	.  reduce 111 (src line 613)
+
+
+state 41
+	identifier:  FUNCTION_NTH.    (112)
+
+	.  reduce 112 (src line 617)
+
 
 state 42
-	from_clause:  FROM tables.    (10)
+	identifier:  FUNCTION_WITH_INS.    (113)
 
-	.  reduce 10 (src line 199)
+	.  reduce 113 (src line 621)
 
 
 state 43
-	tables:  table.    (36)
-	tables:  table.',' tables 
+	identifier:  ERROR.    (114)
 
-	','  shift 100
-	.  reduce 36 (src line 284)
+	.  reduce 114 (src line 625)
 
 
 state 44
-	table:  identified_table.    (38)
+	from_clause:  FROM tables.    (10)
 
-	.  reduce 38 (src line 291)
+	.  reduce 10 (src line 200)
 
 
 state 45
-	table:  virtual_table_object.    (39)
-	table:  virtual_table_object.identifier 
+	tables:  table.    (38)
+	tables:  table.',' tables 
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
-	.  reduce 39 (src line 293)
+	','  shift 103
+	.  reduce 38 (src line 290)
 
-	identifier  goto 101
 
 state 46
-	table:  '('.table ')' 
-	subquery:  '('.select_query ')' 
-	with_clause: .    (48)
+	table:  identified_table.    (40)
 
-	IDENTIFIER  shift 23
-	WITH  shift 6
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	STDIN  shift 50
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 46
-	.  reduce 48 (src line 329)
+	.  reduce 40 (src line 297)
 
-	select_query  goto 103
-	table  goto 102
-	with_clause  goto 5
-	subquery  goto 48
-	table_identifier  goto 47
-	identified_table  goto 44
-	virtual_table_object  goto 45
-	identifier  goto 49
 
 state 47
-	identified_table:  table_identifier.    (44)
-	identified_table:  table_identifier.identifier 
-	identified_table:  table_identifier.AS identifier 
+	table:  virtual_table_object.    (41)
+	table:  virtual_table_object.identifier 
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	AS  shift 105
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
-	.  reduce 44 (src line 309)
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
+	.  reduce 41 (src line 299)
 
 	identifier  goto 104
 
+48: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
 state 48
-	virtual_table_object:  subquery.    (47)
+	table:  '('.table ')' 
+	subquery:  '('.select_query ')' 
+	with_clause: .    (50)
 
-	.  reduce 47 (src line 322)
+	IDENTIFIER  shift 28
+	SELECT  shift 9
+	WITH  shift 7
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
+	STDIN  shift 52
+	'('  shift 48
+	.  error
 
+	select_query  goto 106
+	select_clause  goto 8
+	table  goto 105
+	with_clause  goto 5
+	select_entity  goto 6
+	subquery  goto 50
+	table_identifier  goto 49
+	identified_table  goto 46
+	virtual_table_object  goto 47
+	identifier  goto 51
 
 state 49
-	table_identifier:  identifier.    (42)
+	identified_table:  table_identifier.    (46)
+	identified_table:  table_identifier.identifier 
+	identified_table:  table_identifier.AS identifier 
 
-	.  reduce 42 (src line 299)
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
+	AS  shift 108
+	.  reduce 46 (src line 315)
 
+	identifier  goto 107
 
 state 50
-	table_identifier:  STDIN.    (43)
+	virtual_table_object:  subquery.    (49)
 
-	.  reduce 43 (src line 304)
+	.  reduce 49 (src line 327)
 
 
 state 51
-	select_clause:  SELECT distinct fields.    (8)
+	table_identifier:  identifier.    (44)
 
-	.  reduce 8 (src line 189)
+	.  reduce 44 (src line 305)
 
 
 state 52
-	fields:  field.    (56)
-	fields:  field.',' fields 
+	table_identifier:  STDIN.    (45)
 
-	','  shift 106
-	.  reduce 56 (src line 361)
+	.  reduce 45 (src line 310)
 
 
 state 53
-	field:  field_object.    (33)
-	field:  field_object.AS identifier 
+	select_clause:  SELECT distinct fields.    (9)
 
-	AS  shift 107
-	.  reduce 33 (src line 275)
+	.  reduce 9 (src line 192)
 
 
 state 54
-	field:  wildcard.    (35)
+	fields:  field.    (36)
+	fields:  field.',' fields 
 
-	.  reduce 35 (src line 281)
+	','  shift 109
+	.  reduce 36 (src line 285)
 
 
 state 55
+	field:  field_object.    (33)
+	field:  field_object.AS identifier 
+
+	AS  shift 110
+	.  reduce 33 (src line 276)
+
+
+state 56
+	field:  wildcard.    (35)
+
+	.  reduce 35 (src line 282)
+
+
+state 57
 	field_object:  value.    (31)
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
@@ -654,552 +681,528 @@ state 55
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	AND  shift 119
-	OR  shift 118
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 31 (src line 271)
+	AND  shift 122
+	OR  shift 121
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 31 (src line 272)
 
 
-state 56
+state 58
 	field_object:  analytic_function.    (32)
 
-	.  reduce 32 (src line 273)
+	.  reduce 32 (src line 274)
 
 
-state 57
+state 59
 	wildcard:  '*'.    (65)
 
 	.  reduce 65 (src line 408)
 
 
-state 58
+state 60
 	value:  field_reference.    (121)
 
-	.  reduce 121 (src line 664)
-
-
-state 59
-	value:  primitive_type.    (122)
-
-	.  reduce 122 (src line 666)
-
-
-state 60
-	value:  arithmetic.    (123)
-
-	.  reduce 123 (src line 667)
+	.  reduce 121 (src line 663)
 
 
 state 61
+	value:  primitive_type.    (122)
+
+	.  reduce 122 (src line 665)
+
+
+state 62
+	value:  arithmetic.    (123)
+
+	.  reduce 123 (src line 666)
+
+
+state 63
 	value:  string_operation.    (124)
 
-	.  reduce 124 (src line 668)
+	.  reduce 124 (src line 667)
 
 
- 62: reduce/reduce conflict  (red'ns 67 and 125) on COMPARISON_OP
- 62: reduce/reduce conflict  (red'ns 67 and 125) on '='
-state 62
+ 64: reduce/reduce conflict  (red'ns 67 and 125) on COMPARISON_OP
+ 64: reduce/reduce conflict  (red'ns 67 and 125) on '='
+state 64
 	row_value:  subquery.    (67)
 	value:  subquery.    (125)
 
 	COMPARISON_OP  reduce 67 (src line 420)
 	'='  reduce 67 (src line 420)
-	.  reduce 125 (src line 669)
-
-
-state 63
-	value:  aggregate_function.    (126)
-
-	.  reduce 126 (src line 670)
-
-
-state 64
-	value:  comparison.    (127)
-
-	.  reduce 127 (src line 671)
+	.  reduce 125 (src line 668)
 
 
 state 65
-	value:  logic.    (128)
+	value:  aggregate_function.    (126)
 
-	.  reduce 128 (src line 672)
+	.  reduce 126 (src line 669)
 
 
 state 66
-	variable_substitution:  variable.SUBSTITUTION_OP value 
-	value:  variable.    (129)
+	value:  comparison.    (127)
 
-	SUBSTITUTION_OP  shift 120
-	.  reduce 129 (src line 673)
+	.  reduce 127 (src line 670)
 
 
 state 67
-	value:  variable_substitution.    (130)
+	value:  logic.    (128)
 
-	.  reduce 130 (src line 674)
+	.  reduce 128 (src line 671)
 
 
 state 68
+	variable_substitution:  variable.SUBSTITUTION_OP value 
+	value:  variable.    (129)
+
+	SUBSTITUTION_OP  shift 123
+	.  reduce 129 (src line 672)
+
+
+state 69
+	value:  variable_substitution.    (130)
+
+	.  reduce 130 (src line 673)
+
+
+70: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
+state 70
 	row_value:  '('.values ')' 
 	subquery:  '('.select_query ')' 
 	value:  '('.value ')' 
-	with_clause: .    (48)
+	with_clause: .    (50)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	WITH  shift 6
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	SELECT  shift 9
+	WITH  shift 7
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
-	.  reduce 48 (src line 329)
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
 
-	select_query  goto 103
+	select_query  goto 106
+	select_clause  goto 8
 	with_clause  goto 5
-	field_reference  goto 58
-	value  goto 122
-	values  goto 121
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	select_entity  goto 6
+	field_reference  goto 60
+	value  goto 125
+	values  goto 124
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 69
+state 71
 	analytic_function:  identifier.'(' arguments ')' 
 	field_reference:  identifier.    (81)
 	field_reference:  identifier.'.' identifier 
 	field_reference:  identifier.'.' INTEGER 
 	aggregate_function:  identifier.'(' distinct arguments ')' 
 
-	'('  shift 123
-	'.'  shift 124
-	.  reduce 81 (src line 508)
+	'('  shift 126
+	'.'  shift 127
+	.  reduce 81 (src line 507)
 
 
-70: shift/reduce conflict (shift 125(0), red'n 108(0)) on '('
-state 70
+72: shift/reduce conflict (shift 128(0), red'n 108(0)) on '('
+state 72
 	analytic_function:  COUNT.'(' distinct arguments ')' 
 	analytic_function:  COUNT.'(' distinct wildcard ')' 
 	aggregate_function:  COUNT.'(' distinct arguments ')' 
 	aggregate_function:  COUNT.'(' distinct wildcard ')' 
 	identifier:  COUNT.    (108)
 
-	'('  shift 125
-	.  reduce 108 (src line 602)
-
-
-state 71
-	primitive_type:  STRING.    (132)
-
-	.  reduce 132 (src line 678)
-
-
-state 72
-	primitive_type:  INTEGER.    (133)
-
-	.  reduce 133 (src line 683)
+	'('  shift 128
+	.  reduce 108 (src line 601)
 
 
 state 73
-	primitive_type:  FLOAT.    (134)
+	primitive_type:  STRING.    (132)
 
-	.  reduce 134 (src line 687)
+	.  reduce 132 (src line 677)
 
 
 state 74
-	primitive_type:  ternary.    (135)
+	primitive_type:  INTEGER.    (133)
 
-	.  reduce 135 (src line 691)
+	.  reduce 133 (src line 682)
 
 
 state 75
-	primitive_type:  DATETIME.    (136)
+	primitive_type:  FLOAT.    (134)
 
-	.  reduce 136 (src line 695)
+	.  reduce 134 (src line 686)
 
 
 state 76
-	primitive_type:  null.    (137)
+	primitive_type:  ternary.    (135)
 
-	.  reduce 137 (src line 699)
+	.  reduce 135 (src line 690)
 
 
 state 77
-	arithmetic:  '-'.value 
+	primitive_type:  DATETIME.    (136)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
-	.  error
+	.  reduce 136 (src line 694)
 
-	field_reference  goto 58
-	value  goto 126
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
 
 state 78
-	arithmetic:  '+'.value 
+	primitive_type:  null.    (137)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	.  reduce 137 (src line 698)
+
+
+state 79
+	arithmetic:  '-'.value 
+
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 127
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 129
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-79: shift/reduce conflict (shift 128(0), red'n 110(0)) on '('
-state 79
+state 80
+	arithmetic:  '+'.value 
+
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
+
+	field_reference  goto 60
+	value  goto 130
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
+
+81: shift/reduce conflict (shift 131(0), red'n 110(0)) on '('
+state 81
 	aggregate_function:  AGGREGATE_FUNCTION.'(' distinct arguments ')' 
 	identifier:  AGGREGATE_FUNCTION.    (110)
 
-	'('  shift 128
-	.  reduce 110 (src line 610)
+	'('  shift 131
+	.  reduce 110 (src line 609)
 
 
-state 80
+state 82
 	comparison:  row_value.COMPARISON_OP row_value 
 	comparison:  row_value.'=' row_value 
 
-	COMPARISON_OP  shift 129
-	'='  shift 130
+	COMPARISON_OP  shift 132
+	'='  shift 133
 	.  error
 
-
-state 81
-	comparison:  EXISTS.subquery 
-
-	'('  shift 132
-	.  error
-
-	subquery  goto 131
-
-state 82
-	logic:  NOT.value 
-
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
-	.  error
-
-	field_reference  goto 58
-	value  goto 133
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
 
 state 83
-	logic:  '!'.value 
-
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
-	.  error
-
-	field_reference  goto 58
-	value  goto 134
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
-
-state 84
-	variable:  VARIABLE.    (116)
-
-	.  reduce 116 (src line 635)
-
-
-state 85
-	ternary:  TERNARY.    (120)
-
-	.  reduce 120 (src line 657)
-
-
-state 86
-	null:  NULL.    (115)
-
-	.  reduce 115 (src line 632)
-
-
-state 87
-	inline_tables:  inline_table ',' inline_tables.    (53)
-
-	.  reduce 53 (src line 350)
-
-
-state 88
-	inline_table:  recursive identifier AS.'(' select_query ')' 
+	comparison:  EXISTS.subquery 
 
 	'('  shift 135
 	.  error
 
+	subquery  goto 134
 
-state 89
-	inline_table:  recursive identifier '('.identifiers ')' AS '(' select_query ')' 
+state 84
+	logic:  NOT.value 
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	identifiers  goto 136
-	identifier  goto 137
+	field_reference  goto 60
+	value  goto 136
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
+
+state 85
+	logic:  '!'.value 
+
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
+
+	field_reference  goto 60
+	value  goto 137
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
+
+state 86
+	variable:  VARIABLE.    (116)
+
+	.  reduce 116 (src line 634)
+
+
+state 87
+	ternary:  TERNARY.    (120)
+
+	.  reduce 120 (src line 656)
+
+
+state 88
+	null:  NULL.    (115)
+
+	.  reduce 115 (src line 631)
+
+
+state 89
+	select_query:  with_clause select_entity order_by_clause limit_clause.offset_clause 
+	offset_clause: .    (29)
+
+	OFFSET  shift 91
+	.  reduce 29 (src line 264)
+
+	offset_clause  goto 138
 
 state 90
-	select_query:  with_clause select_entity order_by_clause limit_clause offset_clause.    (6)
+	select_query:  select_entity order_by_clause limit_clause offset_clause.    (7)
 
-	.  reduce 6 (src line 166)
+	.  reduce 7 (src line 171)
 
 
 state 91
 	offset_clause:  OFFSET.value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 138
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 139
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
 state 92
@@ -1219,23 +1222,23 @@ state 92
 	logic:  value.AND value 
 	limit_with: .    (27)
 
-	WITH  shift 141
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	PERCENT  shift 140
-	AND  shift 119
-	OR  shift 118
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 27 (src line 253)
+	WITH  shift 142
+	AND  shift 122
+	OR  shift 121
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	PERCENT  shift 141
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 27 (src line 254)
 
-	limit_with  goto 139
+	limit_with  goto 140
 
 state 93
 	field_reference:  identifier.    (81)
@@ -1243,33 +1246,33 @@ state 93
 	field_reference:  identifier.'.' INTEGER 
 	aggregate_function:  identifier.'(' distinct arguments ')' 
 
-	'('  shift 142
-	'.'  shift 124
-	.  reduce 81 (src line 508)
+	'('  shift 143
+	'.'  shift 127
+	.  reduce 81 (src line 507)
 
 
-94: shift/reduce conflict (shift 143(0), red'n 108(0)) on '('
+94: shift/reduce conflict (shift 144(0), red'n 108(0)) on '('
 state 94
 	aggregate_function:  COUNT.'(' distinct arguments ')' 
 	aggregate_function:  COUNT.'(' distinct wildcard ')' 
 	identifier:  COUNT.    (108)
 
-	'('  shift 143
-	.  reduce 108 (src line 602)
+	'('  shift 144
+	.  reduce 108 (src line 601)
 
 
 state 95
 	order_by_clause:  ORDER BY order_items.    (12)
 
-	.  reduce 12 (src line 207)
+	.  reduce 12 (src line 208)
 
 
 state 96
 	order_items:  order_item.    (13)
 	order_items:  order_item.',' order_items 
 
-	','  shift 144
-	.  reduce 13 (src line 212)
+	','  shift 145
+	.  reduce 13 (src line 213)
 
 
 state 97
@@ -1277,11 +1280,11 @@ state 97
 	order_item:  order_value.order_direction NULLS order_null_position 
 	order_direction: .    (19)
 
-	ASC  shift 146
-	DESC  shift 147
-	.  reduce 19 (src line 230)
+	ASC  shift 147
+	DESC  shift 148
+	.  reduce 19 (src line 231)
 
-	order_direction  goto 145
+	order_direction  goto 146
 
 state 98
 	order_value:  value.    (17)
@@ -1298,761 +1301,798 @@ state 98
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	AND  shift 119
-	OR  shift 118
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 17 (src line 225)
+	AND  shift 122
+	OR  shift 121
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 17 (src line 226)
 
 
 state 99
 	order_value:  analytic_function.    (18)
 
-	.  reduce 18 (src line 227)
+	.  reduce 18 (src line 228)
 
 
 state 100
-	tables:  table ','.tables 
+	inline_tables:  inline_table ',' inline_tables.    (55)
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	STDIN  shift 50
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 46
-	.  error
+	.  reduce 55 (src line 354)
 
-	tables  goto 148
-	table  goto 43
-	subquery  goto 48
-	table_identifier  goto 47
-	identified_table  goto 44
-	virtual_table_object  goto 45
-	identifier  goto 49
 
 state 101
-	table:  virtual_table_object identifier.    (40)
+	inline_table:  recursive identifier AS.'(' select_query ')' 
 
-	.  reduce 40 (src line 294)
+	'('  shift 149
+	.  error
 
 
 state 102
-	table:  '(' table.')' 
+	inline_table:  recursive identifier '('.identifiers ')' AS '(' select_query ')' 
 
-	')'  shift 149
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
 	.  error
 
+	identifiers  goto 150
+	identifier  goto 151
 
 state 103
-	subquery:  '(' select_query.')' 
+	tables:  table ','.tables 
 
-	')'  shift 150
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
+	STDIN  shift 52
+	'('  shift 48
 	.  error
 
+	tables  goto 152
+	table  goto 45
+	subquery  goto 50
+	table_identifier  goto 49
+	identified_table  goto 46
+	virtual_table_object  goto 47
+	identifier  goto 51
 
 state 104
-	identified_table:  table_identifier identifier.    (45)
+	table:  virtual_table_object identifier.    (42)
 
-	.  reduce 45 (src line 314)
+	.  reduce 42 (src line 300)
 
 
 state 105
-	identified_table:  table_identifier AS.identifier 
+	table:  '(' table.')' 
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
+	')'  shift 153
 	.  error
 
-	identifier  goto 151
 
 state 106
-	fields:  field ','.fields 
+	subquery:  '(' select_query.')' 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 70
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'*'  shift 57
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	')'  shift 154
 	.  error
 
-	field_object  goto 53
-	field  goto 52
-	fields  goto 152
-	field_reference  goto 58
-	value  goto 55
-	wildcard  goto 54
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	analytic_function  goto 56
-	identifier  goto 69
 
 state 107
-	field:  field_object AS.identifier 
+	identified_table:  table_identifier identifier.    (47)
 
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
-	.  error
+	.  reduce 47 (src line 319)
 
-	identifier  goto 153
 
 state 108
-	string_operation:  value STRING_OP.value 
+	identified_table:  table_identifier AS.identifier 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
 	.  error
 
-	field_reference  goto 58
-	value  goto 154
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
+	identifier  goto 155
 
 state 109
-	comparison:  value COMPARISON_OP.value 
+	fields:  field ','.fields 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 72
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'*'  shift 59
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 155
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
+	field_object  goto 55
+	field  goto 54
+	fields  goto 156
+	field_reference  goto 60
+	value  goto 57
+	wildcard  goto 56
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	analytic_function  goto 58
+	identifier  goto 71
 
 state 110
-	comparison:  value '='.value 
+	field:  field_object AS.identifier 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
 	.  error
 
-	field_reference  goto 58
-	value  goto 156
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
+	identifier  goto 157
 
 state 111
-	comparison:  value IN.row_value 
+	string_operation:  value STRING_OP.value 
 
-	'('  shift 158
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	row_value  goto 157
-	subquery  goto 159
+	field_reference  goto 60
+	value  goto 158
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
 
 state 112
-	comparison:  value NOT.IN row_value 
+	comparison:  value COMPARISON_OP.value 
 
-	IN  shift 160
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
+	field_reference  goto 60
+	value  goto 159
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
 
 state 113
-	arithmetic:  value '+'.value 
+	comparison:  value '='.value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 161
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 160
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
 state 114
-	arithmetic:  value '-'.value 
+	comparison:  value IN.row_value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	'('  shift 162
 	.  error
 
-	field_reference  goto 58
-	value  goto 162
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
+	row_value  goto 161
+	subquery  goto 163
 
 state 115
-	arithmetic:  value '*'.value 
+	comparison:  value NOT.IN row_value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	IN  shift 164
 	.  error
 
-	field_reference  goto 58
-	value  goto 163
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	identifier  goto 93
 
 state 116
-	arithmetic:  value '/'.value 
+	arithmetic:  value '+'.value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 164
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 165
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
 state 117
-	arithmetic:  value '%'.value 
+	arithmetic:  value '-'.value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 165
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 166
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
 state 118
-	logic:  value OR.value 
+	arithmetic:  value '*'.value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 166
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 167
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
 state 119
-	logic:  value AND.value 
+	arithmetic:  value '/'.value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 167
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 168
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
 state 120
-	variable_substitution:  variable SUBSTITUTION_OP.value 
+	arithmetic:  value '%'.value 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 168
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 169
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
 state 121
+	logic:  value OR.value 
+
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
+
+	field_reference  goto 60
+	value  goto 170
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
+
+state 122
+	logic:  value AND.value 
+
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
+
+	field_reference  goto 60
+	value  goto 171
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
+
+state 123
+	variable_substitution:  variable SUBSTITUTION_OP.value 
+
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 94
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
+
+	field_reference  goto 60
+	value  goto 172
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	identifier  goto 93
+
+state 124
 	row_value:  '(' values.')' 
 
-	')'  shift 169
+	')'  shift 173
 	.  error
 
 
-122: shift/reduce conflict (shift 171(0), red'n 58(0)) on ')'
-state 122
+125: shift/reduce conflict (shift 175(0), red'n 58(0)) on ')'
+state 125
 	values:  value.    (58)
 	values:  value.',' values 
 	string_operation:  value.STRING_OP value 
@@ -2069,136 +2109,136 @@ state 122
 	logic:  value.AND value 
 	value:  '(' value.')' 
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	AND  shift 119
-	OR  shift 118
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	')'  shift 171
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	','  shift 170
+	AND  shift 122
+	OR  shift 121
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	')'  shift 175
+	'/'  shift 119
+	'%'  shift 120
+	','  shift 174
 	.  error
 
 
-123: shift/reduce conflict (shift 23(0), red'n 138(0)) on IDENTIFIER
-123: shift/reduce conflict (shift 71(0), red'n 138(0)) on STRING
-123: shift/reduce conflict (shift 72(0), red'n 138(0)) on INTEGER
-123: shift/reduce conflict (shift 73(0), red'n 138(0)) on FLOAT
-123: shift/reduce conflict (shift 85(0), red'n 138(0)) on TERNARY
-123: shift/reduce conflict (shift 75(0), red'n 138(0)) on DATETIME
-123: shift/reduce conflict (shift 84(0), red'n 138(0)) on VARIABLE
-123: shift/reduce conflict (shift 26(0), red'n 138(0)) on TABLES
-123: shift/reduce conflict (shift 27(0), red'n 138(0)) on VIEWS
-123: shift/reduce conflict (shift 28(0), red'n 138(0)) on CURSORS
-123: shift/reduce conflict (shift 29(0), red'n 138(0)) on FUNCTIONS
-123: shift/reduce conflict (shift 36(0), red'n 138(0)) on FUNCTION_NTH
-123: shift/reduce conflict (shift 37(0), red'n 138(0)) on FUNCTION_WITH_INS
-123: shift/reduce conflict (shift 82(7), red'n 138(0)) on NOT
-123: shift/reduce conflict (shift 38(0), red'n 138(0)) on ERROR
-123: shift/reduce conflict (shift 94(0), red'n 138(0)) on COUNT
-123: shift/reduce conflict (shift 33(0), red'n 138(0)) on LISTAGG
-123: shift/reduce conflict (shift 30(0), red'n 138(0)) on ROWS
-123: shift/reduce conflict (shift 79(0), red'n 138(0)) on AGGREGATE_FUNCTION
-123: shift/reduce conflict (shift 35(0), red'n 138(0)) on ANALYTIC_FUNCTION
-123: shift/reduce conflict (shift 25(0), red'n 138(0)) on NULLS
-123: shift/reduce conflict (shift 86(0), red'n 138(0)) on NULL
-123: shift/reduce conflict (shift 81(0), red'n 138(0)) on EXISTS
-123: shift/reduce conflict (shift 24(0), red'n 138(0)) on TIES
-123: shift/reduce conflict (shift 31(0), red'n 138(0)) on FIELDS
-123: shift/reduce conflict (shift 68(0), red'n 138(0)) on '('
- 123: reduce/reduce conflict  (red'ns 63 and 138) on ')'
-123: shift/reduce conflict (shift 77(10), red'n 138(0)) on '-'
-123: shift/reduce conflict (shift 78(10), red'n 138(0)) on '+'
-123: shift/reduce conflict (shift 83(12), red'n 138(0)) on '!'
-state 123
+126: shift/reduce conflict (shift 28(0), red'n 138(0)) on IDENTIFIER
+126: shift/reduce conflict (shift 73(0), red'n 138(0)) on STRING
+126: shift/reduce conflict (shift 74(0), red'n 138(0)) on INTEGER
+126: shift/reduce conflict (shift 75(0), red'n 138(0)) on FLOAT
+126: shift/reduce conflict (shift 87(0), red'n 138(0)) on TERNARY
+126: shift/reduce conflict (shift 77(0), red'n 138(0)) on DATETIME
+126: shift/reduce conflict (shift 86(0), red'n 138(0)) on VARIABLE
+126: shift/reduce conflict (shift 31(0), red'n 138(0)) on TABLES
+126: shift/reduce conflict (shift 32(0), red'n 138(0)) on VIEWS
+126: shift/reduce conflict (shift 33(0), red'n 138(0)) on CURSORS
+126: shift/reduce conflict (shift 34(0), red'n 138(0)) on FUNCTIONS
+126: shift/reduce conflict (shift 41(0), red'n 138(0)) on FUNCTION_NTH
+126: shift/reduce conflict (shift 42(0), red'n 138(0)) on FUNCTION_WITH_INS
+126: shift/reduce conflict (shift 84(7), red'n 138(0)) on NOT
+126: shift/reduce conflict (shift 43(0), red'n 138(0)) on ERROR
+126: shift/reduce conflict (shift 94(0), red'n 138(0)) on COUNT
+126: shift/reduce conflict (shift 38(0), red'n 138(0)) on LISTAGG
+126: shift/reduce conflict (shift 35(0), red'n 138(0)) on ROWS
+126: shift/reduce conflict (shift 81(0), red'n 138(0)) on AGGREGATE_FUNCTION
+126: shift/reduce conflict (shift 40(0), red'n 138(0)) on ANALYTIC_FUNCTION
+126: shift/reduce conflict (shift 30(0), red'n 138(0)) on NULLS
+126: shift/reduce conflict (shift 88(0), red'n 138(0)) on NULL
+126: shift/reduce conflict (shift 83(0), red'n 138(0)) on EXISTS
+126: shift/reduce conflict (shift 29(0), red'n 138(0)) on TIES
+126: shift/reduce conflict (shift 36(0), red'n 138(0)) on FIELDS
+126: shift/reduce conflict (shift 79(10), red'n 138(0)) on '-'
+126: shift/reduce conflict (shift 80(10), red'n 138(0)) on '+'
+126: shift/reduce conflict (shift 85(12), red'n 138(0)) on '!'
+126: shift/reduce conflict (shift 70(0), red'n 138(0)) on '('
+ 126: reduce/reduce conflict  (red'ns 63 and 138) on ')'
+state 126
 	analytic_function:  identifier '('.arguments ')' 
 	aggregate_function:  identifier '('.distinct arguments ')' 
 	arguments: .    (63)
 	distinct: .    (138)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
 	DISTINCT  shift 20
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  reduce 63 (src line 403)
 
-	field_reference  goto 58
-	value  goto 175
-	values  goto 174
-	arguments  goto 172
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 179
+	values  goto 178
+	arguments  goto 176
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
-	distinct  goto 173
+	distinct  goto 177
 
-state 124
+state 127
 	field_reference:  identifier '.'.identifier 
 	field_reference:  identifier '.'.INTEGER 
 
-	IDENTIFIER  shift 23
-	INTEGER  shift 177
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
+	IDENTIFIER  shift 28
+	INTEGER  shift 181
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
 	.  error
 
-	identifier  goto 176
+	identifier  goto 180
 
-state 125
+state 128
 	analytic_function:  COUNT '('.distinct arguments ')' 
 	analytic_function:  COUNT '('.distinct wildcard ')' 
 	aggregate_function:  COUNT '('.distinct arguments ')' 
@@ -2206,11 +2246,11 @@ state 125
 	distinct: .    (138)
 
 	DISTINCT  shift 20
-	.  reduce 138 (src line 705)
+	.  reduce 138 (src line 704)
 
-	distinct  goto 178
+	distinct  goto 182
 
-state 126
+state 129
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2225,10 +2265,10 @@ state 126
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	.  reduce 89 (src line 529)
+	.  reduce 89 (src line 528)
 
 
-state 127
+state 130
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2243,53 +2283,57 @@ state 127
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	.  reduce 90 (src line 530)
+	.  reduce 90 (src line 529)
 
 
-state 128
+state 131
 	aggregate_function:  AGGREGATE_FUNCTION '('.distinct arguments ')' 
 	distinct: .    (138)
 
 	DISTINCT  shift 20
-	.  reduce 138 (src line 705)
+	.  reduce 138 (src line 704)
 
-	distinct  goto 179
-
-state 129
-	comparison:  row_value COMPARISON_OP.row_value 
-
-	'('  shift 158
-	.  error
-
-	row_value  goto 180
-	subquery  goto 159
-
-state 130
-	comparison:  row_value '='.row_value 
-
-	'('  shift 158
-	.  error
-
-	row_value  goto 181
-	subquery  goto 159
-
-state 131
-	comparison:  EXISTS subquery.    (78)
-
-	.  reduce 78 (src line 493)
-
+	distinct  goto 183
 
 state 132
-	subquery:  '('.select_query ')' 
-	with_clause: .    (48)
+	comparison:  row_value COMPARISON_OP.row_value 
 
-	WITH  shift 6
-	.  reduce 48 (src line 329)
+	'('  shift 162
+	.  error
 
-	select_query  goto 103
-	with_clause  goto 5
+	row_value  goto 184
+	subquery  goto 163
 
 state 133
+	comparison:  row_value '='.row_value 
+
+	'('  shift 162
+	.  error
+
+	row_value  goto 185
+	subquery  goto 163
+
+state 134
+	comparison:  EXISTS subquery.    (78)
+
+	.  reduce 78 (src line 491)
+
+
+135: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
+state 135
+	subquery:  '('.select_query ')' 
+	with_clause: .    (50)
+
+	SELECT  shift 9
+	WITH  shift 7
+	.  error
+
+	select_query  goto 106
+	select_clause  goto 8
+	with_clause  goto 5
+	select_entity  goto 6
+
+state 136
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2304,20 +2348,20 @@ state 133
 	logic:  value.AND value 
 	logic:  NOT value.    (93)
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 93 (src line 542)
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 93 (src line 541)
 
 
-state 134
+state 137
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2332,35 +2376,16 @@ state 134
 	logic:  value.AND value 
 	logic:  '!' value.    (94)
 
-	.  reduce 94 (src line 543)
-
-
-state 135
-	inline_table:  recursive identifier AS '('.select_query ')' 
-	with_clause: .    (48)
-
-	WITH  shift 6
-	.  reduce 48 (src line 329)
-
-	select_query  goto 182
-	with_clause  goto 5
-
-state 136
-	inline_table:  recursive identifier '(' identifiers.')' AS '(' select_query ')' 
-
-	')'  shift 183
-	.  error
-
-
-state 137
-	identifiers:  identifier.    (54)
-	identifiers:  identifier.',' identifiers 
-
-	','  shift 184
-	.  reduce 54 (src line 356)
+	.  reduce 94 (src line 542)
 
 
 state 138
+	select_query:  with_clause select_entity order_by_clause limit_clause offset_clause.    (6)
+
+	.  reduce 6 (src line 160)
+
+
+state 139
 	offset_clause:  OFFSET value.    (30)
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
@@ -2375,173 +2400,202 @@ state 138
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	AND  shift 119
-	OR  shift 118
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 30 (src line 265)
-
-
-state 139
-	limit_clause:  LIMIT value limit_with.    (25)
-
-	.  reduce 25 (src line 243)
+	AND  shift 122
+	OR  shift 121
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 30 (src line 266)
 
 
 state 140
+	limit_clause:  LIMIT value limit_with.    (25)
+
+	.  reduce 25 (src line 244)
+
+
+state 141
 	limit_clause:  LIMIT value PERCENT.limit_with 
 	limit_with: .    (27)
 
-	WITH  shift 141
-	.  reduce 27 (src line 253)
+	WITH  shift 142
+	.  reduce 27 (src line 254)
 
-	limit_with  goto 185
+	limit_with  goto 186
 
-state 141
+state 142
 	limit_with:  WITH.TIES 
 
-	TIES  shift 186
+	TIES  shift 187
 	.  error
 
 
-state 142
+state 143
 	aggregate_function:  identifier '('.distinct arguments ')' 
 	distinct: .    (138)
 
 	DISTINCT  shift 20
-	.  reduce 138 (src line 705)
+	.  reduce 138 (src line 704)
 
-	distinct  goto 173
+	distinct  goto 177
 
-state 143
+state 144
 	aggregate_function:  COUNT '('.distinct arguments ')' 
 	aggregate_function:  COUNT '('.distinct wildcard ')' 
 	distinct: .    (138)
 
 	DISTINCT  shift 20
-	.  reduce 138 (src line 705)
+	.  reduce 138 (src line 704)
 
-	distinct  goto 187
-
-state 144
-	order_items:  order_item ','.order_items 
-
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
-	COUNT  shift 70
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
-	.  error
-
-	field_reference  goto 58
-	value  goto 98
-	order_items  goto 188
-	order_item  goto 96
-	row_value  goto 80
-	order_value  goto 97
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
-	analytic_function  goto 99
-	identifier  goto 69
+	distinct  goto 188
 
 state 145
+	order_items:  order_item ','.order_items 
+
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
+	COUNT  shift 72
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
+
+	field_reference  goto 60
+	value  goto 98
+	order_items  goto 189
+	order_item  goto 96
+	row_value  goto 82
+	order_value  goto 97
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
+	analytic_function  goto 99
+	identifier  goto 71
+
+state 146
 	order_item:  order_value order_direction.    (15)
 	order_item:  order_value order_direction.NULLS order_null_position 
 
-	NULLS  shift 189
-	.  reduce 15 (src line 217)
-
-
-state 146
-	order_direction:  ASC.    (20)
-
-	.  reduce 20 (src line 232)
+	NULLS  shift 190
+	.  reduce 15 (src line 218)
 
 
 state 147
-	order_direction:  DESC.    (21)
+	order_direction:  ASC.    (20)
 
-	.  reduce 21 (src line 233)
+	.  reduce 20 (src line 233)
 
 
 state 148
-	tables:  table ',' tables.    (37)
+	order_direction:  DESC.    (21)
 
-	.  reduce 37 (src line 286)
+	.  reduce 21 (src line 234)
 
 
+149: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
 state 149
-	table:  '(' table ')'.    (41)
+	inline_table:  recursive identifier AS '('.select_query ')' 
+	with_clause: .    (50)
 
-	.  reduce 41 (src line 296)
+	SELECT  shift 9
+	WITH  shift 7
+	.  error
 
+	select_query  goto 191
+	select_clause  goto 8
+	with_clause  goto 5
+	select_entity  goto 6
 
 state 150
-	subquery:  '(' select_query ')'.    (70)
+	inline_table:  recursive identifier '(' identifiers.')' AS '(' select_query ')' 
 
-	.  reduce 70 (src line 436)
+	')'  shift 192
+	.  error
 
 
 state 151
-	identified_table:  table_identifier AS identifier.    (46)
+	identifiers:  identifier.    (56)
+	identifiers:  identifier.',' identifiers 
 
-	.  reduce 46 (src line 318)
+	','  shift 193
+	.  reduce 56 (src line 360)
 
 
 state 152
-	fields:  field ',' fields.    (57)
+	tables:  table ',' tables.    (39)
 
-	.  reduce 57 (src line 363)
+	.  reduce 39 (src line 292)
 
 
 state 153
-	field:  field_object AS identifier.    (34)
+	table:  '(' table ')'.    (43)
 
-	.  reduce 34 (src line 277)
+	.  reduce 43 (src line 302)
 
 
 state 154
+	subquery:  '(' select_query ')'.    (70)
+
+	.  reduce 70 (src line 434)
+
+
+state 155
+	identified_table:  table_identifier AS identifier.    (48)
+
+	.  reduce 48 (src line 323)
+
+
+state 156
+	fields:  field ',' fields.    (37)
+
+	.  reduce 37 (src line 287)
+
+
+state 157
+	field:  field_object AS identifier.    (34)
+
+	.  reduce 34 (src line 278)
+
+
+state 158
 	string_operation:  value.STRING_OP value 
 	string_operation:  value STRING_OP value.    (71)
 	comparison:  value.COMPARISON_OP value 
@@ -2556,15 +2610,15 @@ state 154
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	'*'  shift 115
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 71 (src line 443)
+	'*'  shift 118
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 71 (src line 441)
 
 
-state 155
+state 159
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value COMPARISON_OP value.    (72)
@@ -2579,19 +2633,19 @@ state 155
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	COMPARISON_OP  error
-	STRING_OP  shift 108
 	IN  error
-	'*'  shift 115
+	COMPARISON_OP  error
+	STRING_OP  shift 111
+	'*'  shift 118
 	'='  error
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 72 (src line 467)
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 72 (src line 465)
 
 
-state 156
+state 160
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2606,96 +2660,100 @@ state 156
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	COMPARISON_OP  error
-	STRING_OP  shift 108
 	IN  error
-	'*'  shift 115
+	COMPARISON_OP  error
+	STRING_OP  shift 111
+	'*'  shift 118
 	'='  error
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 74 (src line 476)
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 74 (src line 474)
 
 
-state 157
+state 161
 	comparison:  value IN row_value.    (76)
 
-	.  reduce 76 (src line 484)
+	.  reduce 76 (src line 482)
 
 
-state 158
+162: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
+state 162
 	row_value:  '('.values ')' 
 	subquery:  '('.select_query ')' 
-	with_clause: .    (48)
+	with_clause: .    (50)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	WITH  shift 6
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	SELECT  shift 9
+	WITH  shift 7
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
-	.  reduce 48 (src line 329)
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
+	.  error
 
-	select_query  goto 103
+	select_query  goto 106
+	select_clause  goto 8
 	with_clause  goto 5
-	field_reference  goto 58
-	value  goto 175
-	values  goto 121
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	select_entity  goto 6
+	field_reference  goto 60
+	value  goto 179
+	values  goto 124
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 159
+state 163
 	row_value:  subquery.    (67)
 
 	.  reduce 67 (src line 420)
 
 
-state 160
+state 164
 	comparison:  value NOT IN.row_value 
 
-	'('  shift 158
+	'('  shift 162
 	.  error
 
-	row_value  goto 190
-	subquery  goto 159
+	row_value  goto 194
+	subquery  goto 163
 
-state 161
+state 165
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2710,13 +2768,13 @@ state 161
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	'*'  shift 115
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 84 (src line 523)
+	'*'  shift 118
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 84 (src line 522)
 
 
-state 162
+state 166
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2731,13 +2789,13 @@ state 162
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	'*'  shift 115
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 85 (src line 525)
+	'*'  shift 118
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 85 (src line 524)
 
 
-state 163
+state 167
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2752,10 +2810,10 @@ state 163
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	.  reduce 86 (src line 526)
+	.  reduce 86 (src line 525)
 
 
-state 164
+state 168
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2770,10 +2828,10 @@ state 164
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	.  reduce 87 (src line 527)
+	.  reduce 87 (src line 526)
 
 
-state 165
+state 169
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2788,10 +2846,10 @@ state 165
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	.  reduce 88 (src line 528)
+	.  reduce 88 (src line 527)
 
 
-state 166
+state 170
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2806,21 +2864,21 @@ state 166
 	logic:  value OR value.    (91)
 	logic:  value.AND value 
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	AND  shift 119
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 91 (src line 533)
+	AND  shift 122
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 91 (src line 532)
 
 
-state 167
+state 171
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2835,20 +2893,20 @@ state 167
 	logic:  value.AND value 
 	logic:  value AND value.    (92)
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 92 (src line 538)
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 92 (src line 537)
 
 
-state 168
+state 172
 	string_operation:  value.STRING_OP value 
 	comparison:  value.COMPARISON_OP value 
 	comparison:  value.'=' value 
@@ -2863,151 +2921,151 @@ state 168
 	logic:  value.AND value 
 	variable_substitution:  variable SUBSTITUTION_OP value.    (119)
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	AND  shift 119
-	OR  shift 118
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	.  reduce 119 (src line 650)
+	AND  shift 122
+	OR  shift 121
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	.  reduce 119 (src line 649)
 
 
-state 169
+state 173
 	row_value:  '(' values ')'.    (66)
 
 	.  reduce 66 (src line 415)
 
 
-state 170
+state 174
 	values:  value ','.values 
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  error
 
-	field_reference  goto 58
-	value  goto 175
-	values  goto 191
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 179
+	values  goto 195
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 171
+state 175
 	value:  '(' value ')'.    (131)
 
-	.  reduce 131 (src line 675)
+	.  reduce 131 (src line 674)
 
 
-state 172
+state 176
 	analytic_function:  identifier '(' arguments.')' 
 
-	')'  shift 192
+	')'  shift 196
 	.  error
 
 
-state 173
+state 177
 	aggregate_function:  identifier '(' distinct.arguments ')' 
 	arguments: .    (63)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  reduce 63 (src line 403)
 
-	field_reference  goto 58
-	value  goto 175
-	values  goto 174
-	arguments  goto 193
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 179
+	values  goto 178
+	arguments  goto 197
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 174
+state 178
 	arguments:  values.    (64)
 
 	.  reduce 64 (src line 405)
 
 
-state 175
+state 179
 	values:  value.    (58)
 	values:  value.',' values 
 	string_operation:  value.STRING_OP value 
@@ -3023,507 +3081,503 @@ state 175
 	logic:  value.OR value 
 	logic:  value.AND value 
 
-	COMPARISON_OP  shift 109
-	STRING_OP  shift 108
-	AND  shift 119
-	OR  shift 118
-	NOT  shift 112
-	IN  shift 111
-	'*'  shift 115
-	'='  shift 110
-	'-'  shift 114
-	'+'  shift 113
-	'/'  shift 116
-	'%'  shift 117
-	','  shift 170
+	AND  shift 122
+	OR  shift 121
+	NOT  shift 115
+	IN  shift 114
+	COMPARISON_OP  shift 112
+	STRING_OP  shift 111
+	'*'  shift 118
+	'='  shift 113
+	'-'  shift 117
+	'+'  shift 116
+	'/'  shift 119
+	'%'  shift 120
+	','  shift 174
 	.  reduce 58 (src line 366)
 
 
-state 176
+state 180
 	field_reference:  identifier '.' identifier.    (82)
 
-	.  reduce 82 (src line 513)
+	.  reduce 82 (src line 512)
 
 
-state 177
+state 181
 	field_reference:  identifier '.' INTEGER.    (83)
 
-	.  reduce 83 (src line 517)
+	.  reduce 83 (src line 516)
 
 
-state 178
+state 182
 	analytic_function:  COUNT '(' distinct.arguments ')' 
 	analytic_function:  COUNT '(' distinct.wildcard ')' 
 	aggregate_function:  COUNT '(' distinct.arguments ')' 
 	aggregate_function:  COUNT '(' distinct.wildcard ')' 
 	arguments: .    (63)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'*'  shift 57
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'*'  shift 59
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  reduce 63 (src line 403)
 
-	field_reference  goto 58
-	value  goto 175
-	values  goto 174
-	wildcard  goto 195
-	arguments  goto 194
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 179
+	values  goto 178
+	wildcard  goto 199
+	arguments  goto 198
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 179
+state 183
 	aggregate_function:  AGGREGATE_FUNCTION '(' distinct.arguments ')' 
 	arguments: .    (63)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  reduce 63 (src line 403)
 
-	field_reference  goto 58
-	value  goto 175
-	values  goto 174
-	arguments  goto 196
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 179
+	values  goto 178
+	arguments  goto 200
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 180
+state 184
 	comparison:  row_value COMPARISON_OP row_value.    (73)
 
-	.  reduce 73 (src line 472)
+	.  reduce 73 (src line 470)
 
-
-state 181
-	comparison:  row_value '=' row_value.    (75)
-
-	.  reduce 75 (src line 480)
-
-
-state 182
-	inline_table:  recursive identifier AS '(' select_query.')' 
-
-	')'  shift 197
-	.  error
-
-
-state 183
-	inline_table:  recursive identifier '(' identifiers ')'.AS '(' select_query ')' 
-
-	AS  shift 198
-	.  error
-
-
-state 184
-	identifiers:  identifier ','.identifiers 
-
-	IDENTIFIER  shift 23
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	ERROR  shift 38
-	COUNT  shift 32
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 34
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	TIES  shift 24
-	FIELDS  shift 31
-	.  error
-
-	identifiers  goto 199
-	identifier  goto 137
 
 state 185
-	limit_clause:  LIMIT value PERCENT limit_with.    (26)
+	comparison:  row_value '=' row_value.    (75)
 
-	.  reduce 26 (src line 247)
+	.  reduce 75 (src line 478)
 
 
 state 186
-	limit_with:  WITH TIES.    (28)
+	limit_clause:  LIMIT value PERCENT limit_with.    (26)
 
-	.  reduce 28 (src line 258)
+	.  reduce 26 (src line 248)
 
 
 state 187
+	limit_with:  WITH TIES.    (28)
+
+	.  reduce 28 (src line 259)
+
+
+state 188
 	aggregate_function:  COUNT '(' distinct.arguments ')' 
 	aggregate_function:  COUNT '(' distinct.wildcard ')' 
 	arguments: .    (63)
 
-	IDENTIFIER  shift 23
-	STRING  shift 71
-	INTEGER  shift 72
-	FLOAT  shift 73
-	TERNARY  shift 85
-	DATETIME  shift 75
-	VARIABLE  shift 84
-	TABLES  shift 26
-	VIEWS  shift 27
-	CURSORS  shift 28
-	FUNCTIONS  shift 29
-	FUNCTION_NTH  shift 36
-	FUNCTION_WITH_INS  shift 37
-	NOT  shift 82
-	ERROR  shift 38
+	IDENTIFIER  shift 28
+	STRING  shift 73
+	INTEGER  shift 74
+	FLOAT  shift 75
+	TERNARY  shift 87
+	DATETIME  shift 77
+	VARIABLE  shift 86
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	NOT  shift 84
+	ERROR  shift 43
 	COUNT  shift 94
-	LISTAGG  shift 33
-	ROWS  shift 30
-	AGGREGATE_FUNCTION  shift 79
-	ANALYTIC_FUNCTION  shift 35
-	NULLS  shift 25
-	NULL  shift 86
-	EXISTS  shift 81
-	TIES  shift 24
-	FIELDS  shift 31
-	'*'  shift 57
-	'('  shift 68
-	'-'  shift 77
-	'+'  shift 78
-	'!'  shift 83
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 81
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	NULL  shift 88
+	EXISTS  shift 83
+	TIES  shift 29
+	FIELDS  shift 36
+	'*'  shift 59
+	'-'  shift 79
+	'+'  shift 80
+	'!'  shift 85
+	'('  shift 70
 	.  reduce 63 (src line 403)
 
-	field_reference  goto 58
-	value  goto 175
-	values  goto 174
-	wildcard  goto 201
-	arguments  goto 200
-	row_value  goto 80
-	null  goto 76
-	aggregate_function  goto 63
-	primitive_type  goto 59
-	arithmetic  goto 60
-	ternary  goto 74
-	logic  goto 65
-	string_operation  goto 61
-	subquery  goto 62
-	comparison  goto 64
-	variable  goto 66
-	variable_substitution  goto 67
+	field_reference  goto 60
+	value  goto 179
+	values  goto 178
+	wildcard  goto 202
+	arguments  goto 201
+	row_value  goto 82
+	null  goto 78
+	aggregate_function  goto 65
+	primitive_type  goto 61
+	arithmetic  goto 62
+	ternary  goto 76
+	logic  goto 67
+	string_operation  goto 63
+	subquery  goto 64
+	comparison  goto 66
+	variable  goto 68
+	variable_substitution  goto 69
 	identifier  goto 93
 
-state 188
+state 189
 	order_items:  order_item ',' order_items.    (14)
 
-	.  reduce 14 (src line 214)
+	.  reduce 14 (src line 215)
 
-
-state 189
-	order_item:  order_value order_direction NULLS.order_null_position 
-
-	FIRST  shift 203
-	LAST  shift 204
-	.  error
-
-	order_null_position  goto 202
 
 state 190
-	comparison:  value NOT IN row_value.    (77)
+	order_item:  order_value order_direction NULLS.order_null_position 
 
-	.  reduce 77 (src line 488)
-
-
-state 191
-	values:  value ',' values.    (59)
-
-	.  reduce 59 (src line 368)
-
-
-state 192
-	analytic_function:  identifier '(' arguments ')'.    (60)
-
-	.  reduce 60 (src line 371)
-
-
-state 193
-	aggregate_function:  identifier '(' distinct arguments.')' 
-
-	')'  shift 205
+	FIRST  shift 204
+	LAST  shift 205
 	.  error
 
+	order_null_position  goto 203
 
-state 194
-	analytic_function:  COUNT '(' distinct arguments.')' 
-	aggregate_function:  COUNT '(' distinct arguments.')' 
+state 191
+	inline_table:  recursive identifier AS '(' select_query.')' 
 
 	')'  shift 206
 	.  error
 
 
-state 195
-	analytic_function:  COUNT '(' distinct wildcard.')' 
-	aggregate_function:  COUNT '(' distinct wildcard.')' 
+state 192
+	inline_table:  recursive identifier '(' identifiers ')'.AS '(' select_query ')' 
 
-	')'  shift 207
+	AS  shift 207
 	.  error
+
+
+state 193
+	identifiers:  identifier ','.identifiers 
+
+	IDENTIFIER  shift 28
+	TABLES  shift 31
+	VIEWS  shift 32
+	CURSORS  shift 33
+	FUNCTIONS  shift 34
+	FUNCTION_NTH  shift 41
+	FUNCTION_WITH_INS  shift 42
+	ERROR  shift 43
+	COUNT  shift 37
+	LISTAGG  shift 38
+	ROWS  shift 35
+	AGGREGATE_FUNCTION  shift 39
+	ANALYTIC_FUNCTION  shift 40
+	NULLS  shift 30
+	TIES  shift 29
+	FIELDS  shift 36
+	.  error
+
+	identifiers  goto 208
+	identifier  goto 151
+
+state 194
+	comparison:  value NOT IN row_value.    (77)
+
+	.  reduce 77 (src line 486)
+
+
+state 195
+	values:  value ',' values.    (59)
+
+	.  reduce 59 (src line 368)
 
 
 state 196
-	aggregate_function:  AGGREGATE_FUNCTION '(' distinct arguments.')' 
+	analytic_function:  identifier '(' arguments ')'.    (60)
 
-	')'  shift 208
-	.  error
+	.  reduce 60 (src line 371)
 
 
 state 197
-	inline_table:  recursive identifier AS '(' select_query ')'.    (50)
+	aggregate_function:  identifier '(' distinct arguments.')' 
 
-	.  reduce 50 (src line 334)
-
-
-state 198
-	inline_table:  recursive identifier '(' identifiers ')' AS.'(' select_query ')' 
-
-	'('  shift 209
+	')'  shift 209
 	.  error
 
 
-state 199
-	identifiers:  identifier ',' identifiers.    (55)
-
-	.  reduce 55 (src line 358)
-
-
-state 200
+state 198
+	analytic_function:  COUNT '(' distinct arguments.')' 
 	aggregate_function:  COUNT '(' distinct arguments.')' 
 
 	')'  shift 210
 	.  error
 
 
-state 201
+state 199
+	analytic_function:  COUNT '(' distinct wildcard.')' 
 	aggregate_function:  COUNT '(' distinct wildcard.')' 
 
 	')'  shift 211
 	.  error
 
 
-state 202
-	order_item:  order_value order_direction NULLS order_null_position.    (16)
+state 200
+	aggregate_function:  AGGREGATE_FUNCTION '(' distinct arguments.')' 
 
-	.  reduce 16 (src line 219)
-
-
-state 203
-	order_null_position:  FIRST.    (22)
-
-	.  reduce 22 (src line 236)
+	')'  shift 212
+	.  error
 
 
-state 204
-	order_null_position:  LAST.    (23)
-
-	.  reduce 23 (src line 238)
-
-
-state 205
-	aggregate_function:  identifier '(' distinct arguments ')'.    (95)
-
-	.  reduce 95 (src line 546)
-
-
- 206: reduce/reduce conflict  (red'ns 61 and 97) on $end
- 206: reduce/reduce conflict  (red'ns 61 and 97) on FROM
- 206: reduce/reduce conflict  (red'ns 61 and 97) on ORDER
- 206: reduce/reduce conflict  (red'ns 61 and 97) on LIMIT
- 206: reduce/reduce conflict  (red'ns 61 and 97) on OFFSET
- 206: reduce/reduce conflict  (red'ns 61 and 97) on AS
- 206: reduce/reduce conflict  (red'ns 61 and 97) on ASC
- 206: reduce/reduce conflict  (red'ns 61 and 97) on DESC
- 206: reduce/reduce conflict  (red'ns 61 and 97) on NULLS
- 206: reduce/reduce conflict  (red'ns 61 and 97) on ';'
- 206: reduce/reduce conflict  (red'ns 61 and 97) on ')'
- 206: reduce/reduce conflict  (red'ns 61 and 97) on ','
-state 206
-	analytic_function:  COUNT '(' distinct arguments ')'.    (61)
-	aggregate_function:  COUNT '(' distinct arguments ')'.    (97)
-
-	COMPARISON_OP  reduce 97 (src line 555)
-	STRING_OP  reduce 97 (src line 555)
-	AND  reduce 97 (src line 555)
-	OR  reduce 97 (src line 555)
-	NOT  reduce 97 (src line 555)
-	IN  reduce 97 (src line 555)
-	'*'  reduce 97 (src line 555)
-	'='  reduce 97 (src line 555)
-	'-'  reduce 97 (src line 555)
-	'+'  reduce 97 (src line 555)
-	'/'  reduce 97 (src line 555)
-	'%'  reduce 97 (src line 555)
-	.  reduce 61 (src line 376)
-
-
- 207: reduce/reduce conflict  (red'ns 62 and 98) on $end
- 207: reduce/reduce conflict  (red'ns 62 and 98) on FROM
- 207: reduce/reduce conflict  (red'ns 62 and 98) on ORDER
- 207: reduce/reduce conflict  (red'ns 62 and 98) on LIMIT
- 207: reduce/reduce conflict  (red'ns 62 and 98) on OFFSET
- 207: reduce/reduce conflict  (red'ns 62 and 98) on AS
- 207: reduce/reduce conflict  (red'ns 62 and 98) on ASC
- 207: reduce/reduce conflict  (red'ns 62 and 98) on DESC
- 207: reduce/reduce conflict  (red'ns 62 and 98) on NULLS
- 207: reduce/reduce conflict  (red'ns 62 and 98) on ';'
- 207: reduce/reduce conflict  (red'ns 62 and 98) on ')'
- 207: reduce/reduce conflict  (red'ns 62 and 98) on ','
-state 207
-	analytic_function:  COUNT '(' distinct wildcard ')'.    (62)
-	aggregate_function:  COUNT '(' distinct wildcard ')'.    (98)
-
-	COMPARISON_OP  reduce 98 (src line 559)
-	STRING_OP  reduce 98 (src line 559)
-	AND  reduce 98 (src line 559)
-	OR  reduce 98 (src line 559)
-	NOT  reduce 98 (src line 559)
-	IN  reduce 98 (src line 559)
-	'*'  reduce 98 (src line 559)
-	'='  reduce 98 (src line 559)
-	'-'  reduce 98 (src line 559)
-	'+'  reduce 98 (src line 559)
-	'/'  reduce 98 (src line 559)
-	'%'  reduce 98 (src line 559)
-	.  reduce 62 (src line 380)
-
-
-state 208
-	aggregate_function:  AGGREGATE_FUNCTION '(' distinct arguments ')'.    (96)
-
-	.  reduce 96 (src line 551)
-
-
-state 209
-	inline_table:  recursive identifier '(' identifiers ')' AS '('.select_query ')' 
-	with_clause: .    (48)
-
-	WITH  shift 6
-	.  reduce 48 (src line 329)
-
-	select_query  goto 212
-	with_clause  goto 5
-
-state 210
-	aggregate_function:  COUNT '(' distinct arguments ')'.    (97)
-
-	.  reduce 97 (src line 555)
-
-
-state 211
-	aggregate_function:  COUNT '(' distinct wildcard ')'.    (98)
-
-	.  reduce 98 (src line 559)
-
-
-state 212
-	inline_table:  recursive identifier '(' identifiers ')' AS '(' select_query.')' 
+state 201
+	aggregate_function:  COUNT '(' distinct arguments.')' 
 
 	')'  shift 213
 	.  error
 
 
+state 202
+	aggregate_function:  COUNT '(' distinct wildcard.')' 
+
+	')'  shift 214
+	.  error
+
+
+state 203
+	order_item:  order_value order_direction NULLS order_null_position.    (16)
+
+	.  reduce 16 (src line 220)
+
+
+state 204
+	order_null_position:  FIRST.    (22)
+
+	.  reduce 22 (src line 237)
+
+
+state 205
+	order_null_position:  LAST.    (23)
+
+	.  reduce 23 (src line 239)
+
+
+state 206
+	inline_table:  recursive identifier AS '(' select_query ')'.    (52)
+
+	.  reduce 52 (src line 339)
+
+
+state 207
+	inline_table:  recursive identifier '(' identifiers ')' AS.'(' select_query ')' 
+
+	'('  shift 215
+	.  error
+
+
+state 208
+	identifiers:  identifier ',' identifiers.    (57)
+
+	.  reduce 57 (src line 362)
+
+
+state 209
+	aggregate_function:  identifier '(' distinct arguments ')'.    (95)
+
+	.  reduce 95 (src line 545)
+
+
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on $end
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on FROM
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on LIMIT
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on OFFSET
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on ASC
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on DESC
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on NULLS
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on AS
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on ';'
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on ')'
+ 210: reduce/reduce conflict  (red'ns 61 and 97) on ','
+state 210
+	analytic_function:  COUNT '(' distinct arguments ')'.    (61)
+	aggregate_function:  COUNT '(' distinct arguments ')'.    (97)
+
+	$end  reduce 61 (src line 376)
+	FROM  reduce 61 (src line 376)
+	LIMIT  reduce 61 (src line 376)
+	OFFSET  reduce 61 (src line 376)
+	ASC  reduce 61 (src line 376)
+	DESC  reduce 61 (src line 376)
+	NULLS  reduce 61 (src line 376)
+	AS  reduce 61 (src line 376)
+	';'  reduce 61 (src line 376)
+	')'  reduce 61 (src line 376)
+	','  reduce 61 (src line 376)
+	.  reduce 97 (src line 554)
+
+
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on $end
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on FROM
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on LIMIT
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on OFFSET
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on ASC
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on DESC
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on NULLS
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on AS
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on ';'
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on ')'
+ 211: reduce/reduce conflict  (red'ns 62 and 98) on ','
+state 211
+	analytic_function:  COUNT '(' distinct wildcard ')'.    (62)
+	aggregate_function:  COUNT '(' distinct wildcard ')'.    (98)
+
+	$end  reduce 62 (src line 380)
+	FROM  reduce 62 (src line 380)
+	LIMIT  reduce 62 (src line 380)
+	OFFSET  reduce 62 (src line 380)
+	ASC  reduce 62 (src line 380)
+	DESC  reduce 62 (src line 380)
+	NULLS  reduce 62 (src line 380)
+	AS  reduce 62 (src line 380)
+	';'  reduce 62 (src line 380)
+	')'  reduce 62 (src line 380)
+	','  reduce 62 (src line 380)
+	.  reduce 98 (src line 558)
+
+
+state 212
+	aggregate_function:  AGGREGATE_FUNCTION '(' distinct arguments ')'.    (96)
+
+	.  reduce 96 (src line 550)
+
+
 state 213
-	inline_table:  recursive identifier '(' identifiers ')' AS '(' select_query ')'.    (51)
+	aggregate_function:  COUNT '(' distinct arguments ')'.    (97)
 
-	.  reduce 51 (src line 339)
+	.  reduce 97 (src line 554)
 
+
+state 214
+	aggregate_function:  COUNT '(' distinct wildcard ')'.    (98)
+
+	.  reduce 98 (src line 558)
+
+
+215: shift/reduce conflict (shift 9(0), red'n 50(0)) on SELECT
+state 215
+	inline_table:  recursive identifier '(' identifiers ')' AS '('.select_query ')' 
+	with_clause: .    (50)
+
+	SELECT  shift 9
+	WITH  shift 7
+	.  error
+
+	select_query  goto 216
+	select_clause  goto 8
+	with_clause  goto 5
+	select_entity  goto 6
+
+state 216
+	inline_table:  recursive identifier '(' identifiers ')' AS '(' select_query.')' 
+
+	')'  shift 217
+	.  error
+
+
+state 217
+	inline_table:  recursive identifier '(' identifiers ')' AS '(' select_query ')'.    (53)
+
+	.  reduce 53 (src line 343)
+
+Rule not reduced: with_clause:  
 Rule not reduced: row_values:  row_value 
 Rule not reduced: row_values:  row_value ',' row_values 
 Rule not reduced: field_references:  field_reference 
 Rule not reduced: field_references:  field_reference ',' field_references 
 Rule not reduced: variables:  variable 
 Rule not reduced: variables:  variable ',' variables 
-Rule not reduced: all:  
-Rule not reduced: all:  ALL 
-Rule not reduced: as:  
-Rule not reduced: as:  AS 
-Rule not reduced: comparison_operator:  COMPARISON_OP 
 Rule not reduced: comparison_operator:  '=' 
 
-79 terminals, 55 nonterminals
-146 grammar rules, 214/8000 states
-33 shift/reduce, 27 reduce/reduce conflicts reported
-104 working sets used
-memory: parser 814/120000
-122 extra closures
-1242 shift entries, 35 exceptions
-130 goto entries
-419 entries saved by goto default
-Optimizer space used: output 814/120000
-814 table entries, 283 zero
-maximum spread: 79, maximum offset: 209
+79 terminals, 53 nonterminals
+141 grammar rules, 218/8000 states
+41 shift/reduce, 25 reduce/reduce conflicts reported
+102 working sets used
+memory: parser 817/120000
+114 extra closures
+1253 shift entries, 31 exceptions
+132 goto entries
+436 entries saved by goto default
+Optimizer space used: output 772/120000
+772 table entries, 234 zero
+maximum spread: 79, maximum offset: 215

@@ -21,7 +21,7 @@ func (l *Lexer) Lex(lval *yySymType) int {
 }
 
 func (l *Lexer) Error(e string) {
-	fmt.Printf("tok: %s\n", string(l.token.Literal))
+	fmt.Printf("tok: %v %s\n", TOKEN_FROM <= l.token.Token && l.token.Token <= ERROR, string(l.token.Token))
 	if 0 < l.token.Token {
 		var lit string
 		if TOKEN_FROM <= l.token.Token && l.token.Token <= ERROR {
