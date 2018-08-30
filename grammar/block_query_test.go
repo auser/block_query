@@ -1,9 +1,10 @@
 package grammar
 
 import (
+	"fmt"
 	"testing"
 
-	bq "github.com/auser/block_query/grammar"
+	"github.com/auser/block_query/grammar"
 )
 
 func TestBlockQuery_Select(t *testing.T) {
@@ -11,30 +12,25 @@ func TestBlockQuery_Select(t *testing.T) {
 		query          string
 		expectedASTLen int
 	}{
-		{"select * from transactions", 27},
-		{"select ALL from transactions", 27},
-		{"select * from transactions LIMIT 10", 34},
-		{"select * from transactions LIMIT 10 ORDER BY id", 48},
-		{"select * from transactions ORDER BY id LIMIT 10", 48}, // ordering doesn't matter
-		{"select * from transactions WHERE from='0xdeadbeef'", 58},
-		{"select * from transactions WHERE from='0xdeadbeef' AND value > 100", 76},
-		{"select * from transactions WHERE from='0xdeadbeef' AND value < 100", 76},
-		{"select * from transactions WHERE from='0xdeadbeef' AND to=0xalivebeef", 84},
-		{"select * from transactions WHERE from='0xdeadbeef' AND to != '0xalivebeef'", 86},
-		{"select * from transactions WHERE from='0xdeadbeef' OR to=0xalivebeef LIMIT 10", 91},
+		{"SELECT * FROM transactions", 27},
+		{"select * FROM transactions LIMIT 10", 34},
+		{"select * FROM transactions ORDER BY id ASC", 48},
+		{"select * FROM transactions ORDER BY id ASC LIMIT 10", 48}, // ordering doesn't matter
+		{"select * FROM transactions WHERE fromAddr='0xdeadbeef'", 58},
+		{"select * from transactions WHERE fromAddr='0xdeadbeef' AND value > 100", 76},
+		{"select * from transactions WHERE fromAddr='0xdeadbeef' AND value < 100", 76},
+		{"select * from transactions WHERE fromAddr='0xdeadbeef' AND toAddr='0xalivebeef'", 84},
+		{"select * from transactions WHERE fromAddr='0xdeadbeef' AND toAddr != '0xalivebeef'", 86},
+		{"select * from transactions WHERE fromAddr='0xdeadbeef' OR toAddr='0xalivebeef' LIMIT 10", 91},
 	}
 
-	for i, tt := range tests {
-		q := &bq.BlockQuery{Buffer: tt.query}
-		q.Init()
+	for _, tt := range tests {
+		q, err := grammar.Parse(tt.query)
 
-		if err := q.Parse(); err != nil {
-			t.Fatalf("tests[%d] error: %s\n", i, err)
+		if err != nil {
+			t.Errorf(err.Error())
 		}
-		t.Logf("q: %v\n", len(q.Tokens()))
-
-		if len(q.Tokens()) != tt.expectedASTLen {
-			t.Errorf("tests[%d] incorrect AST len. expected=%q, got=%q", i, tt.expectedASTLen, len(q.Tokens()))
-		}
+		// fmt.Printf("q: %#v\n", q)
+		fmt.Printf("q: %#v\n", q)
 	}
 }

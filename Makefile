@@ -10,6 +10,7 @@ PKGS := $(shell go list ./... | grep -v vendor)
 
 COMMIT = $(shell git rev-parse HEAD | cut -c 1-6)
 BUILD_TIME = $(shell date -u '+%Y-%m-%dT%I:%M:%S%p')
+MAKEFLAGS = -s
 
 PLATFORMS := linux darwin
 os = $(word 1, $@)
@@ -21,6 +22,13 @@ LDFLAGS =-ldflags "-X github.com/auser/block_query/cmd.AppName=$(BINARY) -X gith
 deps:
 	go get -u github.com/pointlander/peg
 	dep ensure
+
+block_query.go: grammar/block_query.y
+	goyacc -v grammar/y.output -o grammar/block_query.go grammar/block_query.y
+	gofmt -w grammar/block_query.go
+
+clean:
+	rm -f grammar/y.output grammar/block_query.go
 
 build:
 	$(GOPATH)/bin/peg grammar/block_query.peg
