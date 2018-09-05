@@ -110,7 +110,6 @@ import (
 %type<identifier>  identifier
 
 %type<token>       distinct
-%type<token>       comparison_operator
 
 %right SUBSTITUTION_OP
 %left UNION EXCEPT
@@ -332,8 +331,7 @@ virtual_table_object
     ;
 
 with_clause
-    :{ $$ = nil }
-    | WITH inline_tables { $$ = WithClause{With: $1.Literal, InlineTables: $2} }
+    : WITH inline_tables { $$ = WithClause{With: $1.Literal, InlineTables: $2} }
     ;
 
 inline_table: recursive identifier AS '(' select_query ')'
@@ -422,7 +420,8 @@ row_value
       $$ = RowValue{BaseExpr: $1.GetBaseExpr(), Value: $1}
     }
 
-row_values: row_value
+row_values
+    : row_value
     {
       $$ = []QueryExpression{$1}
     }
@@ -430,6 +429,7 @@ row_values: row_value
     {
       $$ = append([]QueryExpression{$1}, $3...)
     }
+    ;
 
 subquery
     : '(' select_query ')'
@@ -638,12 +638,12 @@ variable
       }
     ;
 
-variables:
-    variable
+variables
+    : variable ',' variables { $$ = append([]Variable{$1}, $3...) }
+    | variable
       {
         $$ = []Variable{$1}
       }
-    | variable ',' variables { $$ = append([]Variable{$1}, $3...) }
     ;
 
 variable_substitution
@@ -713,12 +713,6 @@ distinct
 // as: { $$ = Token{} }
 //     | AS { $$ = $1 }
 //     ;
-
-comparison_operator: '='
-    {
-        $1.Token = '='
-        $$ = $1
-    }
 
 %%
 
