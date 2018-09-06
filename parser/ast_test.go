@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/auser/block_query/parser"
+	"github.com/auser/block_query/utils"
 )
 
 func TestAST(t *testing.T) {
@@ -18,11 +19,16 @@ func TestAST(t *testing.T) {
 		},
 	}
 
+	data, err := utils.ReadFixture("1.json")
+	if err != nil {
+		t.Error(err)
+	}
+
 	for i, tt := range tests {
 		fmt.Printf("query: %q\n", tt.query)
 		parser := parser.NewParser(tt.query)
-
 		_, err := parser.Parse()
+		parser.Run(data)
 		if err != nil {
 			t.Error(err)
 		}
