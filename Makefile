@@ -27,8 +27,12 @@ block_query.go: grammar/block_query.y
 	goyacc -v grammar/y.output -o grammar/block_query.go grammar/block_query.y
 	gofmt -w grammar/block_query.go
 
+json.go: scanner/json_scanner/json.y
+	goyacc -v scanner/json_scanner/y.output -o scanner/json_scanner/json.go scanner/json_scanner/json.y
+	gofmt -w scanner/json_scanner/json.go
+
 clean:
-	rm -f grammar/y.output grammar/block_query.go
+	rm -f grammar/y.output grammar/block_query.go scanner/json_scanner/json.go scanner/json_scanner/y.output
 
 build:
 	$(GOPATH)/bin/peg grammar/block_query.peg
