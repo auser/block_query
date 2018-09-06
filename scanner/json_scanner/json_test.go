@@ -1,30 +1,55 @@
 package json_scanner
 
 import (
-	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/auser/block_query/scanner/json_scanner"
 )
 
+type i map[string]interface{}
+
 func TestJsonParsing(t *testing.T) {
 	cases := []struct {
 		input    string
-		expected string
+		expected map[string]interface{}
 	}{
 		{
 			input:    `{"hello": "world"}`,
-			expected: "hello world",
+			expected: i{"hello": "world"},
+		},
+		{
+			input:    `{"hello": 10}`,
+			expected: i{"hello": float64(10)},
+		},
+		{
+			input:    `{"hello": null}`,
+			expected: i{"hello": interface{}(nil)},
+		},
+		{
+			input:    `{"name": "ari", "pets": []}`,
+			expected: i{"name": "ari", "pets": []interface{}{}},
+		},
+		{
+			input:    `{"name": "ari", "pets": {}}`,
+			expected: i{"name": "ari", "pets": map[string]interface{}{}},
+		},
+		{
+			input: `{"name": "ari", "pets": {
+				"dogs": ["Ginger"]
+			}}`,
+			expected: i{"name": "ari", "pets": map[string]interface{}{"dogs": []interface{}{"Ginger"}}},
 		},
 	}
 
-	for _, c := range cases {
-		o, err := json_scanner.Parse(c.input, "")
+	for i, c := range cases {
+		o, err := json_scanner.Parse("filename", []byte(c.input))
 		if err != nil {
 			t.Error(err)
 		}
 
-		fmt.Printf("O: %#v\n", o)
-		t.Fail()
+		if !reflect.DeepEqual(o.(map[string]interface{}), c.expected) {
+			t.Errorf("test[%d] got unexpected result. expected=%q, got=%q\n", i, c.expected, o)
+		}
 	}
 }
