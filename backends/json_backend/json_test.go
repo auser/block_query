@@ -1,4 +1,4 @@
-package json_backend
+package json_backend_test
 
 import (
 	"reflect"

@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+// FindKey finds a key by an interface
 func FindKey(key string) OpFunc {
 	return func(in Interface) (Interface, error) {
 

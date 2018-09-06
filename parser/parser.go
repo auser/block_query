@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	sqlparser "github.com/xwb1989/sqlparser"
 )
 
@@ -11,14 +9,6 @@ type Parser struct {
 	query       string
 	statement   sqlparser.Statement
 	latestError error
-}
-
-func Must(op Op, err error) Op {
-	if err != nil {
-		panic(fmt.Errorf("unable to parse selector; %v", err.Error()))
-	}
-
-	return op
 }
 
 // NewParser generates a new parser
@@ -51,18 +41,4 @@ func (p *Parser) Statement() sqlparser.Statement {
 	}
 
 	return p.statement
-}
-
-// Run executes the parser over the data
-func (p *Parser) Run(str string) (interface{}, error) {
-	fmt.Printf("Running %s\n", str)
-	var res map[string]interface{}
-	return res, nil
-}
-
-// AST gets the latest ast
-func (p *Parser) AST() (*AST, error) {
-	ast := &AST{}
-	stmt := p.Statement()
-	return ast.intoAST(stmt)
 }

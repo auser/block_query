@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	bq "github.com/auser/block_query/grammar"
 	"github.com/urfave/cli"
 )
 
@@ -47,18 +46,9 @@ func handleQuery(c *cli.Context) error {
 		log.Fatal("No query defined. Must be passed in")
 	}
 
-	q := &bq.BlockQuery{Buffer: query, Pretty: debugging}
-	q.Init()
-	if err := q.Parse(); err != nil {
-		log.Fatal(err)
+	if debugging || true {
+		fmt.Printf("Handle querying")
 	}
-	q.Execute()
-
-	if debugging {
-		q.PrintSyntaxTree()
-	}
-
-	fmt.Printf("%v\n", q.ExprStack.String())
 
 	return nil
 }

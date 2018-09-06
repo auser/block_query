@@ -17,7 +17,7 @@ os = $(word 1, $@)
 
 LDFLAGS =-ldflags "-X github.com/auser/block_query/cmd.AppName=$(BINARY) -X github.com/auser/block_query/cmd.Branch=$(BRANCH) -X github.com/auser/block_query/cmd.Version=$(VERSION) -X github.com/auser/block_query/cmd.Commit=$(COMMIT) -X github.com/auser/block_query/cmd.BuildTime=$(BUILD_TIME)"
 
-.PHONY: parser build
+.PHONY: parser build test
 
 deps:
 	go get -u github.com/pointlander/peg
@@ -37,3 +37,6 @@ clean:
 build:
 	$(GOPATH)/bin/peg grammar/block_query.peg
 	@go build ${LDFLAGS} -o $(CURR_DIR)/build/bin/$(BINARY)
+
+test:
+	go test ./...

@@ -46,6 +46,10 @@ func TestFindKey_NotExists(t *testing.T) {
 	}
 }
 
+func TestFindKey_IncorrectDatatype(t *testing.T) {
+	t.Skip("Pending")
+}
+
 func TestFindIndex_Exists(t *testing.T) {
 	parser := getParser(t)
 	getArr := FindKey("transactions")

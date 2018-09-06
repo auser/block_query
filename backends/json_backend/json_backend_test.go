@@ -13,5 +13,5 @@ func TestNewJSONBackend(t *testing.T) {
 	n := u.MustInterface(NewJSONBackend(data))
 
 	fmt.Printf("n: %#v\n", n)
-	t.Error()
+	// t.Error()
 }
