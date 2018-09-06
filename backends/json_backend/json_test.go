@@ -1,10 +1,10 @@
-package json_scanner
+package json_backend
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/auser/block_query/scanner/json_scanner"
+	"github.com/auser/block_query/backends/json_backend"
 )
 
 type i map[string]interface{}
@@ -43,7 +43,7 @@ func TestJsonParsing(t *testing.T) {
 	}
 
 	for i, c := range cases {
-		o, err := json_scanner.Parse("filename", []byte(c.input))
+		o, err := json_backend.Parse("filename", []byte(c.input))
 		if err != nil {
 			t.Error(err)
 		}

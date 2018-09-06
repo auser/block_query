@@ -27,9 +27,9 @@ block_query.go: grammar/block_query.y
 	goyacc -v grammar/y.output -o grammar/block_query.go grammar/block_query.y
 	gofmt -w grammar/block_query.go
 
-json.go: scanner/json_scanner/json.y
-	goyacc -v scanner/json_scanner/y.output -o scanner/json_scanner/json.go scanner/json_scanner/json.y
-	gofmt -w scanner/json_scanner/json.go
+json.go:
+	pigeon -o backends/json_backend/json.go  backends/json_backend/json_backend.peg
+	gofmt -w backends/json_backend/json.go
 
 clean:
 	rm -f grammar/y.output grammar/block_query.go scanner/json_scanner/json.go scanner/json_scanner/y.output

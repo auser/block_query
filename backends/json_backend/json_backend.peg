@@ -1,5 +1,5 @@
 {
-package json_scanner
+package json_backend
 
 func toIfaceSlice(v interface{}) []interface{} {
     if v == nil {

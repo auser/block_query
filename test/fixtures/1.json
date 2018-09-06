@@ -2,7 +2,14 @@
   "blockNumber": 1,
   "transactions": [
     {
-      "id": 1
+      "id": 1,
+      "transactionId": "123456",
+      "hash": "0xdeadbeef"
     }
-  ]
+  ],
+  "accounts": {
+    "ari": {
+      "currentBalance": 100000.0
+    }
+  }
 }
