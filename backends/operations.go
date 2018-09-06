@@ -12,17 +12,19 @@ func FindKey(key string) OpFunc {
 				return v, nil
 			}
 		}
-		// pos, err := skipWhitespace(in, 0)
-		// if err != nil {
-		// 	return nil, err
-		// }
-
-		// if v := in[pos]; v != '{' {
-		// 	return nil, newError(pos, v)
-		// }
-
-		// We're in an object now
 
 		return in, nil
+	}
+}
+
+func FindIndex(idx int) OpFunc {
+	return func(in Interface) (Interface, error) {
+		arr := in.([]interface{})
+
+		if idx > len(arr) {
+			return in, errOutOfRange
+		}
+
+		return arr[idx], nil
 	}
 }

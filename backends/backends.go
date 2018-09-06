@@ -9,6 +9,7 @@ import (
 
 var (
 	errUnexpectedEOF = errors.New("unexpected EOF")
+	errOutOfRange    = errors.New("Out of range")
 )
 
 type Interface interface{}

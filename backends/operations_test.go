@@ -45,3 +45,30 @@ func TestFindKey_NotExists(t *testing.T) {
 		t.Errorf("Expecting full response back, but got something different: %v\n", output)
 	}
 }
+
+func TestFindIndex_Exists(t *testing.T) {
+	parser := getParser(t)
+	getArr := FindKey("transactions")
+	arr := u.MustInterface(getArr(parser.(map[string]interface{})))
+
+	f := FindIndex(0)
+	output := u.MustInterface(f(arr))
+	data := output.(map[string]interface{})
+
+	if data["id"] != float64(1) || data["transactionId"] != "123456" {
+		t.Errorf("Fetched incorrect array element\n")
+	}
+}
+
+func TestFindIndex_NotExists(t *testing.T) {
+	parser := getParser(t)
+	getArr := FindKey("transactions")
+	arr := u.MustInterface(getArr(parser.(map[string]interface{})))
+
+	f := FindIndex(40)
+	_, err := f(arr)
+
+	if err != errOutOfRange {
+		t.Errorf("Expected out of range error, but got something else")
+	}
+}
