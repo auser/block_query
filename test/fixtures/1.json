@@ -1,5 +1,7 @@
 {
   "blockNumber": 1,
+  "blockchain": "ethereum",
+  "someRandomNumber": 123456,
   "transactions": [
     {
       "id": 1,

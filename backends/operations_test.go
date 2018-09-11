@@ -1,6 +1,7 @@
 package backends
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -75,4 +76,228 @@ func TestFindIndex_NotExists(t *testing.T) {
 	if err != errOutOfRange {
 		t.Errorf("Expected out of range error, but got something else")
 	}
+}
+
+// Match tests
+func TestContainsKey_Exists(t *testing.T) {
+	parser := getParser(t)
+	f := FindKey("accounts")
+	output := u.MustInterface(f(parser.(map[string]interface{})))
+
+	f = ContainsKey("ari")
+	filter := Filter(f)
+	key, err := filter(output)
+
+	if key == nil {
+		t.Errorf("Expected to find 'ari' key, but found none: %#v.\n", err)
+	}
+}
+
+func TestContainsKey_NotExists(t *testing.T) {
+	parser := getParser(t)
+	f := FindKey("accounts")
+	output := u.MustInterface(f(parser.(map[string]interface{})))
+
+	f = ContainsKey("bob")
+	filter := Filter(f)
+	key, err := filter(output)
+
+	if len(key.(map[string]interface{})) != 0 {
+		t.Errorf("Expected not to find 'bob' key, but found one: %#v.\n", err)
+	}
+}
+
+// func TestApplyAndAppend_Existing(t *testing.T) {
+// 	parser := getParser(t)
+
+// 	findAndGet := func(key string) (Interface, error) {
+// 		return FindKey(key)(parser.(map[string]interface{}))
+// 	}
+// 	accounts, _ := findAndGet("accounts")
+// 	someRandomNumber, _ := findAndGet("someRandomNumber")
+// 	transactions, _ := findAndGet("transactions")
+
+// 	filter1 := func(in Interface) (Interface, error) {
+// 		return in, nil
+// 	}
+
+// 	res, err := ApplyAndAppend(filter1, "accounts", accounts.(map[string]interface{}), nil)
+// 	if res == nil || res["accounts"] == nil {
+// 		t.Errorf("Expected %s to be found and added as an index, but it was not included: %#v\n", "accounts", err)
+// 	}
+
+// 	res, err = ApplyAndAppend(filter1, "someRandomNumber", someRandomNumber.(Interface), nil)
+// 	if res == nil || res["someRandomNumber"] == nil {
+// 		t.Errorf("Expected someRandomNumber to be found and added as an index, but it was not included: %#v\n", err)
+// 	}
+
+// 	res, err = ApplyAndAppend(filter1, "transactions", transactions.(Interface), nil)
+// 	if res == nil || res["transactions"] == nil {
+// 		t.Errorf("Expected transactions to be found and added as an index, but it was not included: %#v\n", err)
+// 	}
+// }
+
+// func TestApplyAndAppend_NotExisting(t *testing.T) {
+// 	parser := getParser(t)
+
+// 	findAndGet := func(key string) (Interface, error) {
+// 		return FindKey(key)(parser.(map[string]interface{}))
+// 	}
+// 	accounts, _ := findAndGet("accounts")
+// 	transactions, _ := findAndGet("transactions")
+// 	someRandomNumber, _ := findAndGet("someRandomNumber")
+
+// 	filter1 := func(in Interface) (Interface, error) {
+// 		return nil, errors.New("Some error")
+// 	}
+
+// 	checkNotAppended := func(key string, val Interface) {
+// 		res, err := ApplyAndAppend(filter1, key, val, nil)
+// 		if err != nil {
+// 			t.Errorf("Expected %s to be found and added as an index, but it was not included: %#v\n", "accounts", err)
+// 		}
+// 		if len(res) > 0 {
+// 			t.Errorf("Expected result to be an empty dict, but it was not: %#v\n", res)
+// 		}
+// 	}
+
+// 	checkNotAppended("accounts", accounts.(map[string]interface{}))
+// 	checkNotAppended("transactions", transactions.([]interface{}))
+// 	checkNotAppended("someRandomNumber", someRandomNumber.(Interface))
+// }
+
+func TestContainsKeyEqualTo(t *testing.T) {
+	parser := getParser(t)
+
+	filter := Filter(ContainsKeyEqualTo("blockNumber", float64(1)))
+	data, err := filter(parser.(map[string]interface{}))
+
+	keys := allKeys(data)
+	fmt.Printf("key: %#v\n", keys)
+	if len(keys) == 1 {
+		t.Errorf("Key blockNumber was expected, but got an error: %#v\n", err)
+	}
+
+	filter = Filter(ContainsKeyEqualTo("badMan", "doc"))
+	data, _ = filter(parser.(map[string]interface{}))
+
+	if len(allKeys(data)) != 0 {
+		t.Errorf("Expecting value not equal, but got a different error: %#v\n", len(allKeys(data)))
+	}
+
+	filter = Filter(ContainsKeyEqualTo("blockNumber", "doc"))
+	data, _ = filter(parser.(map[string]interface{}))
+
+	if len(allKeys(data)) != 0 {
+		t.Errorf("Expecting value not equal, but got a different error: %#v\n", err)
+	}
+}
+
+func TestContainsKeyLike(t *testing.T) {
+	parser := getParser(t)
+
+	filter := Filter(ContainsKeyLike("blockchain", "eth*"))
+	data, err := filter(parser.(map[string]interface{}))
+	keys := allKeys(data)
+
+	if len(keys) == 1 {
+		t.Errorf("Key blockchain was expected, but got an error: %#v\n", err)
+	}
+
+	filter = Filter(ContainsKeyLike("blockchain", "eo"))
+	data, err = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != 0 {
+		t.Errorf("expected key not equal, but got different error: %#v\n", err)
+	}
+
+	filter = Filter(ContainsKeyLike("blockchain", "something else"))
+	data, err = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != 0 {
+		t.Errorf("expected key not equal, but got different error: %#v\n", err)
+	}
+}
+
+func TestComparisonOperators(t *testing.T) {
+	parser := getParser(t)
+
+	filter := Filter(ContainsKeyGreaterThan("someRandomNumber", float64(1)))
+
+	origLen := len(parser.(map[string]interface{}))
+	data, _ := filter(parser.(map[string]interface{}))
+	keys := allKeys(data)
+
+	if len(keys) != origLen {
+		t.Errorf("Expected someRandomNumber to be greater than 1, but it was not: %#v\n", keys)
+	}
+
+	filter = Filter(ContainsKeyGreaterThan("somethingElse", 234567))
+	data, _ = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != 0 {
+		t.Errorf("Expected somethingElse not to be greater than 234567, but it was: %#v\n", keys)
+	}
+
+	// GTE
+	filter = Filter(ContainsKeyGreaterThanOrEqual("someRandomNumber", 123456))
+	data, _ = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != origLen {
+		t.Errorf("Expected someRandomNumber to be greater than or equal to 123456, but it was not: %#v\n", keys)
+	}
+
+	filter = Filter(ContainsKeyGreaterThanOrEqual("someRandomNumber", 123457))
+	data, _ = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != 0 {
+		t.Errorf("Expected someRandomNumber to be greater than or equal to 123456, but it was not: %#v\n", keys)
+	}
+
+	// LT
+	filter = Filter(ContainsKeyLessThan("someRandomNumber", 234578))
+	data, _ = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != origLen {
+		t.Errorf("Expected someRandomNumber to be less than 23478, but it was not: %#v\n", keys)
+	}
+
+	filter = Filter(ContainsKeyLessThan("someRandomNumber", 1))
+	data, _ = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != 0 {
+		t.Errorf("Expected someRandomNumber to be less than 1, but it was not: %#v\n", keys)
+	}
+
+	// LTE
+	filter = Filter(ContainsKeyLessThanOrEqual("someRandomNumber", 123456))
+	data, _ = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != origLen {
+		t.Errorf("Expected someRandomNumber to be less than or equal to 123456, but it was not: %#v\n", keys)
+	}
+
+	filter = Filter(ContainsKeyLessThan("someRandomNumber", 1))
+	data, _ = filter(parser.(map[string]interface{}))
+	keys = allKeys(data)
+
+	if len(keys) != 0 {
+		t.Errorf("Expected someRandomNumber to be less than 1, but it was not: %#v\n", keys)
+	}
+}
+
+func allKeys(data Interface) []string {
+	keys := make([]string, 0)
+	for key := range data.(map[string]interface{}) {
+		keys = append(keys, key)
+	}
+	return keys
 }
