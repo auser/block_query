@@ -22,6 +22,10 @@ func TestBlockQuery_Select(t *testing.T) {
 			"select id from transactions",
 		},
 		{
+			"SELECT *",
+			"select * from dual",
+		},
+		{
 			"SELECT * from transactions where fromAddr='0xdeadbeef'",
 			"select * from transactions where fromAddr = '0xdeadbeef'",
 		},

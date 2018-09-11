@@ -8,17 +8,12 @@ import (
 )
 
 var (
-	errUnexpectedEOF     = errors.New("unexpected EOF")
-	errOutOfRange        = errors.New("Out of range")
-	errNotFound          = errors.New("Not found")
-	errUnhandledDatatype = errors.New("Unhandled datatype")
-	//
-	errKeyValueNotEqual              = errors.New("Key not equal")
-	errNotRegexpSupported            = errors.New("Not a regexp")
-	errKeyValueNotGreaterThan        = errors.New("Value not greater than")
-	errKeyValueNotGreaterThanOrEqual = errors.New("Value not greater than or equal")
-	errKeyValueNotLessThan           = errors.New("Value not less than")
-	errKeyValueNotLessThanOrEqual    = errors.New("Value not less than or equal")
+	errUnexpectedEOF      = errors.New("unexpected EOF")
+	errOutOfRange         = errors.New("Out of range")
+	errNotFound           = errors.New("Not found")
+	errUnhandledDatatype  = errors.New("Unhandled datatype")
+	errKeyValueNotEqual   = errors.New("Key not equal")
+	errNotRegexpSupported = errors.New("Not a regexp")
 )
 
 // Interface maps an anonymous interface

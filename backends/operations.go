@@ -1,6 +1,7 @@
 package backends
 
 import (
+	"errors"
 	"regexp"
 	"strings"
 )
@@ -32,6 +33,28 @@ func FindIndex(idx int) OpFunc {
 	}
 }
 
+// FetchKeys fetchs only the keys requested
+func FetchKeys(keys ...string) OpFunc {
+	return func(in Interface) (Interface, error) {
+		arr := in.([]interface{})
+		ret := make([]Interface, 0)
+
+		fetchKeys := func(in Interface) Interface {
+			data := make(map[string]interface{}, len(keys))
+			for _, key := range keys {
+				val := in.(map[string]interface{})[key]
+				data[key] = val
+			}
+			return data
+		}
+
+		for _, val := range arr {
+			ret = append(ret, fetchKeys(val).(Interface))
+		}
+		return ret, nil
+	}
+}
+
 // Limit limits the number of return values
 func Limit(n int) OpFunc {
 	return func(in Interface) (Interface, error) {
@@ -40,7 +63,10 @@ func Limit(n int) OpFunc {
 	}
 }
 
-// Matching operations (where)
+/******************************************
+ * Matching operations (where)
+ ******************************************/
+
 // ContainsKey checks to see if a map contains a key
 func ContainsKey(key string) OpFunc {
 	return func(in Interface) (Interface, error) {
@@ -91,38 +117,38 @@ func ContainsKeyLike(key string, value string) OpFunc {
 func ContainsKeyGreaterThan(key string, value float64) OpFunc {
 	return containsKeyWithOp(key, value, func(a float64, b float64) bool {
 		return a > b
-	})
+	}, "value not greater than")
 }
 
 // ContainsKeyGreaterThanOrEqual checks to see if the value is greater than or equal to a value
 func ContainsKeyGreaterThanOrEqual(key string, value float64) OpFunc {
 	return containsKeyWithOp(key, value, func(a float64, b float64) bool {
 		return a >= b
-	})
+	}, "value not greater than or equal")
 }
 
 // ContainsKeyLessThan checks to see if the value is less than a value
 func ContainsKeyLessThan(key string, value float64) OpFunc {
 	return containsKeyWithOp(key, value, func(a float64, b float64) bool {
 		return a < b
-	})
+	}, "value not less than")
 }
 
 // ContainsKeyLessThanOrEqual checks to see if the value is less than a value
 func ContainsKeyLessThanOrEqual(key string, value float64) OpFunc {
 	return containsKeyWithOp(key, value, func(a float64, b float64) bool {
 		return a <= b
-	})
+	}, "value not less than or equal")
 }
 
-func containsKeyWithOp(key string, value float64, op ComparisonFunc) OpFunc {
+func containsKeyWithOp(key string, value float64, op ComparisonFunc, errStr string) OpFunc {
 	return func(in Interface) (Interface, error) {
 		if val, ok := in.(map[string]interface{})[key]; ok {
 			res := op.Apply(val.(float64), value)
 			if res == true {
 				return in, nil
 			} else {
-				return nil, errKeyValueNotGreaterThan
+				return nil, errors.New(errStr)
 			}
 		} else {
 			return nil, errNotFound
