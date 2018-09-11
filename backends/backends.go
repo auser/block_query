@@ -90,16 +90,6 @@ func Filter(filters ...MatchOp) OpFunc {
 				data = make(map[string]interface{}, 0)
 				break
 			}
-			// for key := range in.(map[string]interface{}) {
-			// 	data, _ = applyAndAppend(filter, key, in, data)
-			// 	// 		switch val.(type) {
-			// 	// 		case []interface{}:
-			// 	// 			for _, nVal := range val {
-			// 	// 				res, err = filter(nVal)
-			// 	// 				data = append(data, applyAndAppend())
-			// 	// 			}
-			// 	// 		}
-			// }
 		}
 
 		return data, nil

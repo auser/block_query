@@ -32,8 +32,15 @@ func FindIndex(idx int) OpFunc {
 	}
 }
 
-// Matching operations (where)
+// Limit limits the number of return values
+func Limit(n int) OpFunc {
+	return func(in Interface) (Interface, error) {
+		// TODO
+		return in, nil
+	}
+}
 
+// Matching operations (where)
 // ContainsKey checks to see if a map contains a key
 func ContainsKey(key string) OpFunc {
 	return func(in Interface) (Interface, error) {
