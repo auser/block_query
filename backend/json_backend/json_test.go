@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/auser/block_query/backends/json_backend"
+	"github.com/auser/block_query/backend/json_backend"
 )
 
 type i map[string]interface{}
